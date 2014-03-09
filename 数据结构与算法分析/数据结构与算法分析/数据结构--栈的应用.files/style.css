@@ -1,0 +1,105 @@
+BODY {
+	MARGIN-TOP: 5px
+}
+A:link {
+	COLOR: #1110ac; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: purple; TEXT-DECORATION: none
+}
+A:active {
+	COLOR: red; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: red; TEXT-DECORATION: underline
+}
+P {
+	FONT-SIZE: 9pt; LINE-HEIGHT: 150%; FONT-FAMILY: 宋体,Arial
+}
+LI {
+	FONT-SIZE: 9pt; LINE-HEIGHT: 150%; FONT-FAMILY: 宋体,Arial
+}
+TD {
+	FONT-SIZE: 9pt; LINE-HEIGHT: 150%; FONT-FAMILY: 宋体,Arial
+}
+.fontsize10 {
+	FONT-SIZE: 10pt; FONT-FAMILY: 宋体,Arial
+}
+.fontsize115 {
+	FONT-SIZE: 11.5pt; FONT-FAMILY: 宋体,Arial
+}
+A.a1:link {
+	COLOR: #cc0000; TEXT-DECORATION: none
+}
+A.a1:visited {
+	COLOR: #cc0000; TEXT-DECORATION: none
+}
+A.a1:active {
+	COLOR: red; TEXT-DECORATION: none
+}
+A.a1:hover {
+	COLOR: red; TEXT-DECORATION: underline
+}
+.redfont {
+	COLOR: #ff0000
+}
+.t1 {
+	BORDER-RIGHT: #c0c0c0 1px solid; BORDER-TOP: #c0c0c0 1px solid; BORDER-LEFT: #c0c0c0 1px solid; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+DIV.quote {
+	BORDER-RIGHT: #cccccc 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #cccccc 1px solid; PADDING-LEFT: 5px; BACKGROUND: #f3f3f3; PADDING-BOTTOM: 5px; MARGIN: 5px 20px; BORDER-LEFT: #cccccc 1px solid; LINE-HEIGHT: normal; PADDING-TOP: 5px; BORDER-BOTTOM: #cccccc 1px solid
+}
+.tb_main_style {
+	WORD-BREAK: break-all; BORDER-BOTTOM: #c4c4c4 1px solid; HEIGHT: 25px; WORD-WRAP: break-word
+}
+.tb_head_style {
+	FONT-WEIGHT: bold; BACKGROUND-IMAGE: url(image/bkpic1.gif); HEIGHT: 25px; TEXT-ALIGN: center
+}
+.button_style {
+	FONT-SIZE: 9pt; FONT-FAMILY: "宋体"; BACKGROUND-COLOR: #dddddd
+}
+.input_style {
+	BORDER-RIGHT: #a5a6a5 1px solid; BORDER-TOP: #a5a6a5 1px solid; FONT-SIZE: 9pt; BORDER-LEFT: #a5a6a5 1px solid; BORDER-BOTTOM: #a5a6a5 1px solid
+}
+.table_border {
+	BORDER-RIGHT: #6b9ad6 1px solid; BORDER-TOP: #6b9ad6 1px solid; MARGIN-TOP: 5px; BORDER-LEFT: #6b9ad6 1px solid; BORDER-BOTTOM: #6b9ad6 1px solid
+}
+.tb_list {
+	BORDER-BOTTOM: #c4c4c4 1px solid; HEIGHT: 28px
+}
+.tb_list1 {
+	BORDER-BOTTOM: #c4c4c4 1px solid; HEIGHT: 28px
+}
+.tb_topic {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 0px; PADDING-TOP: 2px; HEIGHT: 18px
+}
+.tb_topic1 {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 0px; PADDING-TOP: 2px; HEIGHT: 18px
+}
+.tb_bgcolor {
+	BACKGROUND-COLOR: #d6ebff
+}
+.tb_topic {
+	BACKGROUND-COLOR: #d6ebff
+}
+.tb_bgcolor1 {
+	BACKGROUND-COLOR: #f0f8ff
+}
+.tb_list {
+	BACKGROUND-COLOR: #f0f8ff
+}
+.td_content {
+	FONT-SIZE: 9pt; MARGIN: 5px 25px; WORD-BREAK: break-all; FONT-FAMILY: "宋体"; WORD-WRAP: break-word
+}
+.myweb_td1 {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; FONT-WEIGHT: bold; FONT-SIZE: 14px; LINE-HEIGHT: 150%; FONT-FAMILY: "宋体"; HEIGHT: 25px
+}
+.myweb_td2 {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; LINE-HEIGHT: 150%; FONT-FAMILY: "宋体"; HEIGHT: 25px; WORD-WRAP: break-word
+}
+.myweb_td3 {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; FONT-SIZE: 9pt; COLOR: #990000; LINE-HEIGHT: 150%; FONT-FAMILY: "宋体"; HEIGHT: 25px
+}
+#upnum {
+	FONT-WEIGHT: bold; FONT-SIZE: 16px
+}

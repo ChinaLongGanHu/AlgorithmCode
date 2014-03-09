@@ -1,0 +1,323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.luocong.com/dsaanotes/index-Z-H-12.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记11.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-11.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-13.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_11></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_11">第十一章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_11">排序</A></H1>
+<P></P><A name=node_sec_11.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_11.1">11.1&nbsp;&nbsp;基本概念</A></H2>
+<P>排序可以说是百花齐放，据算法宗师高德纳爷爷的《TAOCP》第三卷所记载的至少就有20多种。从大的方面来说，排序可以分成内排序和外排序——内排序是外排序的基础。我们常用的内排序又可以粗略分成下面的类型：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>插入排序 </P>
+  <LI>
+  <P>交换排序 </P>
+  <LI>
+  <P>堆排序 </P>
+  <LI>
+  <P>归并排序 </P></LI></OL>
+<P></P>
+<P>别看排序有那么多种类型，但它们都离不开这样的核心思想：</P>
+<P></P>
+<DIV align=left><PRE class=scheme>|<SPAN class=variable>有序序列区</SPAN>|<SPAN class=variable>无序序列区</SPAN>|
+</PRE></DIV>
+<P></P>
+<P>一个待排序列总是被不断从无序序列转变为有序序列。</P>
+<P>从效率来说，目前已知最快的排序方法是“快速排序（QuickSort）”。牛B吧？呵呵，连名字都起得那么牛。（别的排序方法的名称要么是表示出它的本质（例如“插入排序”），要么是以其发明者命名的（例如“ShellSort”），只有QuickSort是直言不讳地用“Quick”来命名，这或许就是在排序上的最高荣誉吧！）</P>
+<P>但要注意的是，没有一种排序方法的效率是在任何情况下都能独占鳌头的，具体采取哪种方法要根据实际情况而定（有的人喜欢用快速排序通吃各种情况，这有点像是赌博了，呵呵）。我举个例子，假设要在10000个随机的数据中找出最大的10个数，那么采用堆排序应该是最合适的，因为：第一，经验指出堆排序是一个非常稳定的算法，在各种环境中其效率变化不会太大；第二，堆排序的特性决定了只要构建一棵根节点为最大数的优先队列树，然后取其前10个根节点就行了。</P>
+<P>该说的基本上就说完了，我不想重复敲入书上的话，各种排序算法的具体解释请参阅教科书，下面给出代码。</P>
+<P></P><A name=node_sec_11.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_11.2">11.2&nbsp;&nbsp;代码实现</A></H2>
+<P>各种排序的代码实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   sort.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-23 16:49:42</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__SORT_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__SORT_H__</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CSort</SPAN>
+{
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=comment>// the following three functions are for HeapSort():</SPAN>
+    <SPAN class=keyword>int</SPAN>  <SPAN class=variable>LeftChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>PercDown</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*l</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>*r</SPAN>);
+    <SPAN class=comment>// the following two functions are for MergeSort():</SPAN>
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>MSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>Merge</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>lpos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>rpos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>rightend</SPAN>);
+    <SPAN class=comment>// for QuickSort():</SPAN>
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>Median3</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>);
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>InsertSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>ShellSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>HeapSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>MergeSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>QuickSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>);
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>InsertSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>n</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>i</SPAN>];             <SPAN class=comment>// copy it first</SPAN>
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>i</SPAN>; <SPAN class=variable>j</SPAN> &gt; <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>--j</SPAN>) <SPAN class=comment>// unsorted region; (0 ~ (i - 1)) is sorted</SPAN>
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>] &gt; <SPAN class=variable>tmp</SPAN>)
+                <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>];<SPAN class=comment>// move back elements to empty a right position</SPAN>
+            <SPAN class=keyword>else</SPAN>
+                <SPAN class=keyword>break</SPAN>;          <SPAN class=comment>// we got it! x[j] is the right position</SPAN>
+        <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp</SPAN>;             <SPAN class=comment>// place it to the right position</SPAN>
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>ShellSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nIncrement</SPAN>;
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>nIncrement</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>/</SPAN> <SPAN class=selfeval>2</SPAN>; <SPAN class=variable>nIncrement</SPAN> &gt; <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>nIncrement</SPAN> <SPAN class=variable>/=</SPAN> <SPAN class=selfeval>2</SPAN>)
+    {
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>nIncrement</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>n</SPAN>; <SPAN class=variable>++i</SPAN>)
+        {
+            <SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>i</SPAN>];
+            <SPAN class=keyword>for</SPAN> (<SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>i</SPAN>; <SPAN class=variable>j</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>nIncrement</SPAN>; <SPAN class=variable>j</SPAN> <SPAN class=variable>-=</SPAN> <SPAN class=variable>nIncrement</SPAN>)
+            {
+                <SPAN class=keyword>if</SPAN> (<SPAN class=variable>tmp</SPAN> &lt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=variable>nIncrement</SPAN>])
+                    <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=variable>nIncrement</SPAN>];
+                <SPAN class=keyword>else</SPAN>
+                    <SPAN class=keyword>break</SPAN>;
+            }
+            <SPAN class=variable>x</SPAN>[<SPAN class=variable>j</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp</SPAN>;
+        }
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>LeftChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> (<SPAN class=selfeval>2</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>PercDown</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nChild</SPAN>;
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>i</SPAN>]; <SPAN class=variable>LeftChild</SPAN>(<SPAN class=variable>i</SPAN>) &lt; <SPAN class=variable>n</SPAN>; <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>nChild</SPAN>)
+    {
+        <SPAN class=variable>nChild</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>LeftChild</SPAN>(<SPAN class=variable>i</SPAN>);
+        <SPAN class=keyword>if</SPAN> ((<SPAN class=variable>nChild</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>) <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>nChild</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>] &gt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>nChild</SPAN>]))
+            <SPAN class=variable>++nChild</SPAN>;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>tmp</SPAN> &lt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>nChild</SPAN>])
+            <SPAN class=variable>x</SPAN>[<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>nChild</SPAN>];
+        <SPAN class=keyword>else</SPAN>
+            <SPAN class=keyword>break</SPAN>;
+    }
+    <SPAN class=variable>x</SPAN>[<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Swap</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*l</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>*r</SPAN>)
+{
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>*l</SPAN>;
+    <SPAN class=variable>*l</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>*r</SPAN>;
+    <SPAN class=variable>*r</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>HeapSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>/</SPAN> <SPAN class=selfeval>2</SPAN>; <SPAN class=variable>i</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>--i</SPAN>)    <SPAN class=comment>// build heap</SPAN>
+        <SPAN class=variable>PercDown</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &gt; <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>--i</SPAN>)
+    {
+        <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=selfeval>0</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>i</SPAN>]);         <SPAN class=comment>// delete max</SPAN>
+        <SPAN class=variable>PercDown</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>0</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>i</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Merge</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>lpos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>rpos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>rightend</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>leftend</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>numelements</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmppos</SPAN>;
+
+    <SPAN class=variable>leftend</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>rpos</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>;
+    <SPAN class=variable>tmppos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>lpos</SPAN>;
+    <SPAN class=variable>numelements</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>rightend</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=variable>lpos</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>;
+
+    <SPAN class=comment>// main loop</SPAN>
+    <SPAN class=keyword>while</SPAN> ((<SPAN class=variable>lpos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>leftend</SPAN>) <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=variable>rpos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>rightend</SPAN>))
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>lpos</SPAN>] &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>rpos</SPAN>])
+            <SPAN class=variable>tmp</SPAN>[<SPAN class=variable>tmppos++</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>lpos++</SPAN>];
+        <SPAN class=keyword>else</SPAN>
+            <SPAN class=variable>tmp</SPAN>[<SPAN class=variable>tmppos++</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>rpos++</SPAN>];
+    }
+
+    <SPAN class=keyword>while</SPAN> (<SPAN class=variable>lpos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>leftend</SPAN>)     <SPAN class=comment>// copy rest of first half</SPAN>
+        <SPAN class=variable>tmp</SPAN>[<SPAN class=variable>tmppos++</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>lpos++</SPAN>];
+    <SPAN class=keyword>while</SPAN> (<SPAN class=variable>rpos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>rightend</SPAN>)    <SPAN class=comment>// copy rest of second half</SPAN>
+        <SPAN class=variable>tmp</SPAN>[<SPAN class=variable>tmppos++</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>rpos++</SPAN>];
+
+    <SPAN class=comment>// copy tmp back</SPAN>
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>numelements</SPAN>; <SPAN class=variable>++i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>--rightend</SPAN>)
+        <SPAN class=variable>x</SPAN>[<SPAN class=variable>rightend</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp</SPAN>[<SPAN class=variable>rightend</SPAN>];
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>MSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>tmp</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>center</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>left</SPAN> &lt; <SPAN class=variable>right</SPAN>)
+    {
+        <SPAN class=variable>center</SPAN> <SPAN class=variable>=</SPAN> (<SPAN class=variable>left</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>right</SPAN>) <SPAN class=variable>/</SPAN> <SPAN class=selfeval>2</SPAN>;
+        <SPAN class=variable>MSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>tmp</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>center</SPAN>);
+        <SPAN class=variable>MSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>tmp</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>center</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN>);
+        <SPAN class=variable>Merge</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>tmp</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>center</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>MergeSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>*tmp</SPAN>;
+
+    <SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>T</SPAN>[<SPAN class=variable>n</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=keyword>sizeof</SPAN>(<SPAN class=variable>T</SPAN>)]);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>tmp</SPAN>)
+    {
+        <SPAN class=variable>MSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>tmp</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>0</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>);
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>tmp</SPAN>;
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Median3</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>center</SPAN> <SPAN class=variable>=</SPAN> (<SPAN class=variable>left</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>right</SPAN>) <SPAN class=variable>/</SPAN> <SPAN class=selfeval>2</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>left</SPAN>] &gt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>center</SPAN>])
+        <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>left</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>center</SPAN>]);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>left</SPAN>] &gt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>right</SPAN>])
+        <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>left</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>right</SPAN>]);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>center</SPAN>] &gt; <SPAN class=variable>x</SPAN>[<SPAN class=variable>right</SPAN>])
+        <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>center</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>right</SPAN>]);
+
+    <SPAN class=comment>// invariant: x[left] &lt;= x[center] &lt;= x[right]</SPAN>
+
+    <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>center</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>right</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>]);    <SPAN class=comment>// hide pivot</SPAN>
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>x</SPAN>[<SPAN class=variable>right</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>];                <SPAN class=comment>// return pivot</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>QuickSort</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>x</SPAN>[]<SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>right</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>cutoff</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>3</SPAN>;
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>pivot</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>left</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>cutoff</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>right</SPAN>)
+    {
+        <SPAN class=variable>pivot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Median3</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN>);
+        <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>left</SPAN>;
+        <SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>right</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=keyword>for</SPAN> (;;)
+        {
+            <SPAN class=keyword>while</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>++i</SPAN>] &lt; <SPAN class=variable>pivot</SPAN>) {}
+            <SPAN class=keyword>while</SPAN> (<SPAN class=variable>x</SPAN>[<SPAN class=variable>--j</SPAN>] &gt; <SPAN class=variable>pivot</SPAN>) {}
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>j</SPAN>)
+                <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>i</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>j</SPAN>]);
+            <SPAN class=keyword>else</SPAN>
+                <SPAN class=keyword>break</SPAN>;
+        }
+        <SPAN class=variable>Swap</SPAN>(<SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>i</SPAN>]<SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;x</SPAN>[<SPAN class=variable>right</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>]); <SPAN class=comment>// restore pivot</SPAN>
+        <SPAN class=variable>QuickSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>i</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>);
+        <SPAN class=variable>QuickSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN>);
+    }
+    <SPAN class=keyword>else</SPAN>    <SPAN class=comment>// do an insertion sort on the subarray</SPAN>
+        <SPAN class=variable>InsertSort</SPAN>(<SPAN class=variable>x</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=variable>left</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __SORT_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   sort.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-23 16:49:39</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"sort.h"</SPAN>
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>x</SPAN>[] <SPAN class=variable>=</SPAN> {<SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>9</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>6</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>8</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>10</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>7</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>5</SPAN>};
+    <SPAN class=variable>CSort</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>sort</SPAN>;
+
+    <SPAN class=variable>sort.QuickSort</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>0</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>9</SPAN>);
+    <SPAN class=comment>// sort.ShellSort(x, 10);</SPAN>
+}</PRE>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-11.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-13.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

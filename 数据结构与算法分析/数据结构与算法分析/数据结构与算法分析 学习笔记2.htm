@@ -1,0 +1,700 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-3.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记2.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-2.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-4.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_2></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_2">第二章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_2">单链表</A></H1>
+<P>链表是最常用、最简单和最基本的数据结构之一。我们先来看看单链表的实现。</P>
+<P></P><A name=node_sec_2.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.1">2.1&nbsp;&nbsp;代码实现</A></H2>
+<P>单链表的实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   slist.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2004-12-29 9:58:38</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__SINGLE_LIST_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__SINGLE_LIST_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>assert.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>crtdbg.h</SPAN>&gt;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>_NORMAL_BLOCK</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>THIS_FILE</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>__LINE__</SPAN>)
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN>
+<SPAN class=keyword>#undef</SPAN> <SPAN class=variable>THIS_FILE</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>THIS_FILE</SPAN>[] <SPAN class=variable>=</SPAN> <SPAN class=variable>__FILE__</SPAN>;
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>  <SPAN class=variable>assert</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#else</SPAN>   <SPAN class=comment>// not _DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// _DEBUG</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CNode</SPAN>
+{
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*next</SPAN>;
+    <SPAN class=variable>CNode</SPAN>() : <SPAN class=variable>data</SPAN>(<SPAN class=variable>T</SPAN>())<SPAN class=keyword>,</SPAN> <SPAN class=variable>next</SPAN>(<SPAN class=builtin>NULL</SPAN>) {}
+    <SPAN class=variable>CNode</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN>) : <SPAN class=variable>data</SPAN>(<SPAN class=variable>initdata</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>next</SPAN>(<SPAN class=builtin>NULL</SPAN>) {}
+    <SPAN class=variable>CNode</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) : <SPAN class=variable>data</SPAN>(<SPAN class=variable>initdata</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>next</SPAN>(<SPAN class=variable>p</SPAN>) {}
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CSList</SPAN>
+{
+<SPAN class=keyword>protected</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*m_pNodeHead</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CSList</SPAN>();
+    <SPAN class=variable>CSList</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN>);
+    <SPAN class=variable>~CSList</SPAN>();
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>IsEmpty</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>GetCount</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>InsertBefore</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>InsertAfter</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>AddHead</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>AddTail</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>RemoveAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>);
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>RemoveHead</SPAN>();
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>RemoveTail</SPAN>();
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>RemoveAll</SPAN>();
+    <SPAN class=variable>T&amp;</SPAN>      <SPAN class=variable>GetTail</SPAN>();
+    <SPAN class=variable>T</SPAN>       <SPAN class=variable>GetTail</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T&amp;</SPAN>      <SPAN class=variable>GetHead</SPAN>();
+    <SPAN class=variable>T</SPAN>       <SPAN class=variable>GetHead</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T&amp;</SPAN>      <SPAN class=variable>GetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>);
+    <SPAN class=variable>T</SPAN>       <SPAN class=variable>GetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>SetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>) <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>CSList</SPAN>() : <SPAN class=variable>m_nCount</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>(<SPAN class=builtin>NULL</SPAN>)
+{
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>CSList</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN>) : <SPAN class=variable>m_nCount</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>(<SPAN class=builtin>NULL</SPAN>)
+{
+    <SPAN class=variable>AddHead</SPAN>(<SPAN class=variable>initdata</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>~CSList</SPAN>()
+{
+    <SPAN class=variable>RemoveAll</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>IsEmpty</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>AddHead</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pNewNode</SPAN>;
+
+    <SPAN class=variable>pNewNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pNewNode</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+    <SPAN class=variable>++m_nCount</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>AddTail</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>InsertAfter</SPAN>(<SPAN class=variable>GetCount</SPAN>()<SPAN class=keyword>,</SPAN> <SPAN class=variable>data</SPAN>);
+}
+
+<SPAN class=comment>// if success, return the position of the new node.</SPAN>
+<SPAN class=comment>// if fail, return 0.</SPAN>
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>InsertBefore</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetPos</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode1</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode2</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pNewNode</SPAN>;
+
+    <SPAN class=variable>pNewNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pNewNode</SPAN>)
+    {
+        <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit0</SPAN>;
+    }
+
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+
+    <SPAN class=comment>// if the list is empty, replace the head node with the new node.</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>)
+    {
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+        <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit1</SPAN>;
+    }
+
+    <SPAN class=comment>// is pos range valid?</SPAN>
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=comment>// insert before head node?</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pos</SPAN>)
+    {
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+        <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit1</SPAN>;
+    }
+
+    <SPAN class=comment>// if the list is not empty and is not inserted before head node,</SPAN>
+    <SPAN class=comment>// seek to the pos of the list and insert the new node before it.</SPAN>
+    <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+        <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+    <SPAN class=variable>pTmpNode2-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+
+    <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN>;
+
+<SPAN class=variable>Exit1</SPAN>:
+    <SPAN class=variable>++m_nCount</SPAN>;
+<SPAN class=variable>Exit0</SPAN>:
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>nRetPos</SPAN>;
+}
+
+<SPAN class=comment>// if success, return the position of the new node.</SPAN>
+<SPAN class=comment>// if fail, return 0.</SPAN>
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>InsertAfter</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetPos</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pNewNode</SPAN>;
+
+    <SPAN class=variable>pNewNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pNewNode</SPAN>)
+    {
+        <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit0</SPAN>;
+    }
+
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+
+    <SPAN class=comment>// if the list is empty, replace the head node with the new node.</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>)
+    {
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+        <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit1</SPAN>;
+    }
+
+    <SPAN class=comment>// is pos range valid?</SPAN>
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=comment>// if the list is not empty,</SPAN>
+    <SPAN class=comment>// seek to the pos of the list and insert the new node after it.</SPAN>
+    <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+    <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+
+    <SPAN class=variable>nRetPos</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>;
+
+<SPAN class=variable>Exit1</SPAN>:
+    <SPAN class=variable>++m_nCount</SPAN>;
+<SPAN class=variable>Exit0</SPAN>:
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>nRetPos</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetCount</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>RemoveAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode1</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode2</SPAN>;
+
+    <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=comment>// head node?</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pos</SPAN>)
+    {
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit1</SPAN>;
+    }
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=comment>// we will get the previous node of the target node after</SPAN>
+        <SPAN class=comment>// the for loop finished, and it would be stored into pTmpNode2</SPAN>
+        <SPAN class=variable>pTmpNode2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+        <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+    <SPAN class=variable>pTmpNode2-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+
+<SPAN class=variable>Exit1</SPAN>:
+    <SPAN class=keyword>delete</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+    <SPAN class=variable>--m_nCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>RemoveHead</SPAN>()
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+    <SPAN class=variable>RemoveAt</SPAN>(<SPAN class=selfeval>1</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>RemoveTail</SPAN>()
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+    <SPAN class=variable>RemoveAt</SPAN>(<SPAN class=variable>m_nCount</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>RemoveAll</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN>;
+
+    <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode</SPAN>;
+    }
+
+    <SPAN class=variable>m_nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetTail</SPAN>()
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetTail</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetHead</SPAN>()
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_pNodeHead-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetHead</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_pNodeHead-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>SetAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+    <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __SINGLE_LIST_H__</SPAN></PRE>
+<P></P>
+<P>调用如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   slist.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2004-12-29 10:41:18</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"slist.h"</SPAN>
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN>;
+    <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>slist</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.AddHead</SPAN>(<SPAN class=selfeval>1</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.GetCount</SPAN>()<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>5</SPAN>);
+    <SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.GetCount</SPAN>()<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>6</SPAN>);
+    <SPAN class=variable>slist.AddTail</SPAN>(<SPAN class=selfeval>10</SPAN>);
+    <SPAN class=variable>slist.InsertAfter</SPAN>(<SPAN class=variable>slist.InsertBefore</SPAN>(<SPAN class=variable>slist.GetCount</SPAN>()<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>7</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>8</SPAN>);
+    <SPAN class=variable>slist.SetAt</SPAN>(<SPAN class=variable>slist.GetCount</SPAN>()<SPAN class=keyword>,</SPAN> <SPAN class=selfeval>9</SPAN>);
+    <SPAN class=variable>slist.RemoveHead</SPAN>();
+    <SPAN class=variable>slist.RemoveTail</SPAN>();
+
+    <SPAN class=comment>// print out elements</SPAN>
+    <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>slist.GetCount</SPAN>();
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+        <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>slist.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>) &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}</PRE>
+<P></P>
+<P>代码比较简单，一看就明白，懒得解释了。如果有bug，请告诉我。</P>
+<P></P><A name=node_sec_2.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.2">2.2&nbsp;&nbsp;效率问题</A></H2>
+<P>考虑到效率的问题，代码中声明了一个成员变量：m_nCount，用它来记录链表的结点个数。这样有什么好处呢？在某些情况下就不用遍历链表了，例如，至少在GetCount()时能提高速度。</P>
+<P>原书中提到了一个“表头”（header）或“哑结点”（dummy 
+node）的概念，这个结点作为第一个结点，位置在0，它是不用的，我个人认为这样做有点浪费空间，所以并没有采用这种做法。</P>
+<P>单链表在效率上最大的问题在于，如果要插入一个结点到链表的末端或者删除末端的一个结点，则需要遍历整个链表，时间复杂度是O(N)。平均来说，要访问一个结点，时间复杂度也有O(N/2)。这是链表本身的性质所造成的，没办法解决。不过我们可以采用双链表和循环链表来改善这种情况。</P>
+<P></P><A name=node_sec_2.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.3">2.3&nbsp;&nbsp;应用：一元多项式（加法和乘法）</A></H2>
+<P></P><A name=node_sec_2.3.1></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.3.1">2.3.1&nbsp;&nbsp;基础知识</A></H3>
+<P>我们使用一元多项式来说明单链表的应用。假设有两个一元多项式：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>P1</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>=</SPAN> <SPAN class=variable>X^2</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>2X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>3</SPAN>
+</PRE></DIV>
+<P></P>
+<P>以及</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>P2</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>=</SPAN> <SPAN class=variable>3X^3</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>10X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>6</SPAN>
+</PRE></DIV>
+<P></P>
+<P>现在运用中学的基础知识，计算它们的和：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>P1</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>+</SPAN> <SPAN class=variable>P2</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>=</SPAN> (<SPAN class=variable>X^2</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>2X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>3</SPAN>) <SPAN class=variable>+</SPAN> (<SPAN class=variable>3X^3</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>10X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>6</SPAN>)
+              <SPAN class=variable>=</SPAN> <SPAN class=variable>3X^3</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>1X^2</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>12X^1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>9</SPAN>
+</PRE></DIV>
+<P></P>
+<P>以及计算它们的乘积：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>P1</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>*</SPAN> <SPAN class=variable>P2</SPAN>(<SPAN class=variable>X</SPAN>) <SPAN class=variable>=</SPAN> (<SPAN class=variable>X^2</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>2X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>3</SPAN>) <SPAN class=variable>*</SPAN> (<SPAN class=variable>3X^3</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>10X</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>6</SPAN>)
+              <SPAN class=variable>=</SPAN> <SPAN class=variable>3X^5</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>6X^4</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>19X^3</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>26X^2</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>42X^1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>18</SPAN>
+</PRE></DIV>
+<P></P>
+<P>怎么样，很容易吧？:) 
+但我们是灵长类动物，这么繁琐的计算怎么能用手工来完成呢？（试想一下，如果多项式非常大的话……）我们的目标是用计算机来完成这些计算任务，代码就在下面。</P>
+<P></P><A name=node_sec_2.3.2></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.3.2">2.3.2&nbsp;&nbsp;代码实现</A></H3>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   poly.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2004-12-30 17:32:54</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"slist.h"</SPAN>
+
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>Max</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN><SPAN class=variable>y</SPAN>) (((<SPAN class=variable>x</SPAN>)&gt;(<SPAN class=variable>y</SPAN>)) <SPAN class=variable>?</SPAN> (<SPAN class=variable>x</SPAN>) : (<SPAN class=variable>y</SPAN>))
+
+<SPAN class=keyword>typedef</SPAN> <SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagPOLYNOMIAL</SPAN>
+{
+    <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>Coeff</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>HighPower</SPAN>;
+} <SPAN class=variable>*</SPAN> <SPAN class=variable>Polynomial</SPAN>;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>AddPolynomial</SPAN>(
+    <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>polysum</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly1</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly2</SPAN>
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>sum</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmp1</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmp2</SPAN>;
+
+    <SPAN class=variable>polysum-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Max</SPAN>(<SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>);
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>polysum-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>tmp1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>i</SPAN>);
+        <SPAN class=variable>tmp2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>i</SPAN>);
+        <SPAN class=variable>sum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>tmp1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>tmp2</SPAN>;
+        <SPAN class=variable>polysum-</SPAN>&gt;<SPAN class=variable>Coeff.AddTail</SPAN>(<SPAN class=variable>sum</SPAN>);
+    }
+}
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>MulPolynomial</SPAN>(
+    <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>polymul</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly1</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly2</SPAN>
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmp</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmp1</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>tmp2</SPAN>;
+
+    <SPAN class=variable>polymul-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>;
+
+    <SPAN class=comment>// initialize all elements to zero</SPAN>
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>polymul-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>; <SPAN class=variable>++i</SPAN>)
+        <SPAN class=variable>polymul-</SPAN>&gt;<SPAN class=variable>Coeff.AddTail</SPAN>(<SPAN class=selfeval>0</SPAN>);
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>tmp1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>j</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>; <SPAN class=variable>++j</SPAN>)
+        {
+            <SPAN class=variable>tmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>polymul-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>j</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+            <SPAN class=variable>tmp2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>j</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+            <SPAN class=variable>tmp</SPAN> <SPAN class=variable>+=</SPAN> <SPAN class=variable>tmp1</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=variable>tmp2</SPAN>;
+            <SPAN class=variable>polymul-</SPAN>&gt;<SPAN class=variable>Coeff.SetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>j</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>tmp</SPAN>);
+        }
+    }
+}
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>PrintPoly</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>poly-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN>; <SPAN class=variable>i</SPAN> &gt; <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i--</SPAN> )
+        <SPAN class=variable>printf</SPAN>( <SPAN class=selfeval>"%dX^%d + "</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly-</SPAN>&gt;<SPAN class=variable>Coeff.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>i</SPAN>);
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"%d\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly-</SPAN>&gt;<SPAN class=variable>Coeff.GetHead</SPAN>());
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>poly2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>Polynomial</SPAN> <SPAN class=variable>polyresult</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>poly1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagPOLYNOMIAL</SPAN>);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>poly1</SPAN>)
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit0</SPAN>;
+
+    <SPAN class=variable>poly2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagPOLYNOMIAL</SPAN>);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>poly2</SPAN>)
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit0</SPAN>;
+
+    <SPAN class=variable>polyresult</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagPOLYNOMIAL</SPAN>);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>polyresult</SPAN>)
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit0</SPAN>;
+
+    <SPAN class=comment>// P1(X) = X^2 + 2X + 3</SPAN>
+    <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>2</SPAN>;
+    <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>0</SPAN>);
+    <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>poly1-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>3</SPAN>);
+
+    <SPAN class=comment>// P2(X) = 3X^3 + 10X + 6</SPAN>
+    <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>HighPower</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>3</SPAN>;
+    <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>0</SPAN>);
+    <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>10</SPAN>);
+    <SPAN class=variable>poly2-</SPAN>&gt;<SPAN class=variable>Coeff.AddHead</SPAN>(<SPAN class=selfeval>6</SPAN>);
+
+    <SPAN class=comment>// add result = 3X^3 + 1X^2 + 12X^1 + 9</SPAN>
+    <SPAN class=variable>AddPolynomial</SPAN>(<SPAN class=variable>polyresult</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly2</SPAN>);
+    <SPAN class=variable>PrintPoly</SPAN>(<SPAN class=variable>polyresult</SPAN>);
+
+    <SPAN class=comment>// reset</SPAN>
+    <SPAN class=variable>polyresult-</SPAN>&gt;<SPAN class=variable>Coeff.RemoveAll</SPAN>();
+
+    <SPAN class=comment>// mul result = 3X^5 + 6X^4 + 19X^3 + 26X^2 + 42X^1 + 18</SPAN>
+    <SPAN class=variable>MulPolynomial</SPAN>(<SPAN class=variable>polyresult</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>poly2</SPAN>);
+    <SPAN class=variable>PrintPoly</SPAN>(<SPAN class=variable>polyresult</SPAN>);
+
+<SPAN class=variable>Exit0</SPAN>:
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>poly1</SPAN>)
+    {
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>poly1</SPAN>;
+        <SPAN class=variable>poly1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    }
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>poly2</SPAN>)
+    {
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>poly2</SPAN>;
+        <SPAN class=variable>poly2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    }
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>polyresult</SPAN>)
+    {
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>polyresult</SPAN>;
+        <SPAN class=variable>polyresult</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    }
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_2.3.3></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_2.3.3">2.3.3&nbsp;&nbsp;说明</A></H3>
+<P>原书中只给出了一元多项式的数组实现，而没有给出单链表的代码。实际上用单链表最大的好处在于多项式的项数可以为任意大。（当然只是理论上的。什么？你的内存是无限大的？好吧，当我没说……）</P>
+<P>我没有实现减法操作，实际上减法可以转换成加法来完成，例如 a - b 可以换算成 a + 
+(-b)，那么我们的目标就转变为做一个负号的运算了。至于除法，可以通过先换算“-”，然后再用原位加法来计算。（现在你明白加法有多重要了吧？^_^）有兴趣的话，不妨您试试完成它，我的目标只是掌握单链表的使用，因此不再继续深究。 
+</P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-2.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-4.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

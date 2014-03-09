@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-2.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记1.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-3.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_1></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_1">第一章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_1">前言</A></H1>
+<P></P><A name=node_sec_1.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_1.1">1.1&nbsp;&nbsp;所选教材</A></H2>
+<P>我所选择的教材是《数据结构与算法分析——C语言描述》（原书第2版），英文版的名称是《Data Structures and Algorithm 
+Analysis in C》，作者是：(美)Mark Allen 
+Weiss。原书曾被评为20世纪顶尖的30部计算机著作之一。之所以选这本书，还因为它的简体中文版翻译得相当不错，几乎没有给我的阅读带来什么障碍。^_^</P>
+<P>这本教科书所使用的是C语言，也许很多人会说C语言已经过时了，但是，我认为在数据结构的学习中，应该用尽量简单的语言，以免进入了语言的细枝末节中，反而冲淡了主题。实际上在国外的许多大学中（甚至中学），数据结构和算法分析的课程是选用Scheme的，例如MIT麻省理工大学极其著名的SICP课程。呵呵，语言又能说明什么呢？</P>
+<P></P><A name=node_sec_1.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_1.2">1.2&nbsp;&nbsp;写作原因</A></H2>
+<P>数据结构与算法分析是计算机专业的必修课——但遗憾的是，我在大学阶段并不是计算机专业的学生，以至于没有系统地跟着老师学习过这门课程。现在我已经工作了，在实际的工作中，我经常感到自己的基础知识不够，有很多问题无法解决。在经历了一段痛苦的斗争后，我选择了自学的道路，想把这门课程扎扎实实地学好。</P>
+<P>教科书中已经给出了大部分的代码，因此，我基本上也只是重复敲入了一次而已（或者是改写成C++），但这并不是没有意义的。我们在看书的时候经常会觉得自己已经懂了，但如果真的要亲自动手去做了，却会感到无法下手。我认为，亲自输入一次代码并调试通过，比任何空谈都有效。</P>
+<P>在具体的代码实现上，我可能会参考MFC、STL……但也可能会进行一定的修改。</P>
+<P></P><A name=node_sec_1.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_1.3">1.3&nbsp;&nbsp;一些约定</A></H2>
+<P>我使用的是Visual C++ 
+6.0编译器，并将会用C/C++来撰写代码（我可能会用C++改写原书中的例子，以便能用在工作中，但一些地方还是会用C），不会使用任何与平台相关的特性（因此可以保证有比较好的移植性）。原书中的代码风格跟我平时的代码风格非常相近，但有一些地方我可能会进行一些改动。</P>
+<P>我认为数据结构的代码不需要任何界面，因此，请您新建一个工程，类型为Win32 Console 
+Application，即控制台工程。然后添加一个.h头文件和一个.c/.cpp文件。头文件中，我一般会写3行固定格式的预编译语句，如下：</P>
+<P></P><PRE class=scheme><SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__LIST_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__LIST_H__</SPAN>
+
+<SPAN class=comment>// TODO: Add header body code here</SPAN>
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __LIST_H__</SPAN>
+</PRE>
+<P></P>
+<P>表示这是一个list.h。</P>
+<P>另外，C++操作符new的实现在不同的编译器中都不太一样，在VC6中，如果new失败，则会返回NULL，程序中我用检测返回值是否为NULL来判断new是否成功，但如果这个代码是用别的编译器编译的，则要特别注意别的编译器是否也是用NULL来表示new失败的，否则很可能会导致无法意料的结果。</P>
+<P>为了方便调试内存泄漏，我会在一些地方写入这样的代码：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>assert.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>crtdbg.h</SPAN>&gt;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>_NORMAL_BLOCK</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>THIS_FILE</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>__LINE__</SPAN>)
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN>
+<SPAN class=keyword>#undef</SPAN> <SPAN class=variable>THIS_FILE</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>THIS_FILE</SPAN>[] <SPAN class=variable>=</SPAN> <SPAN class=variable>__FILE__</SPAN>;
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>  <SPAN class=variable>assert</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#else</SPAN>   <SPAN class=comment>// not _DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// _DEBUG</SPAN>
+</PRE></DIV>
+<P></P>
+<P>以及：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+</PRE></DIV>
+<P></P>
+<P>在阅读时不用管它们，直接略过即可。</P>
+<P></P><A name=node_sec_1.4></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_1.4">1.4&nbsp;&nbsp;历史记录</A></H2>
+<P><STRONG>[2005-01-30]</STRONG> 图的遍历一章。<BR><STRONG>[2005-01-28]</STRONG> 
+图的储存一章。<BR><STRONG>[2005-01-24]</STRONG> 排序一章。<BR><STRONG>[2005-01-21]</STRONG> 
+AVL树一章。<BR><STRONG>[2005-01-18]</STRONG> 
+二叉搜索树一章。<BR><STRONG>[2005-01-14]</STRONG> 
+二叉树一章。<BR><STRONG>[2005-01-09]</STRONG> 递归一章。<BR><STRONG>[2005-01-08]</STRONG> 
+队列一章。<BR><STRONG>[2005-01-07]</STRONG> 栈一章。<BR><STRONG>[2005-01-05]</STRONG> 
+循环链表一章。<BR><STRONG>[2005-01-04]</STRONG> 双链表一章。<BR><STRONG>[2004-12-30]</STRONG> 
+单链表一章。</P>
+<P></P><A name=node_sec_1.5></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_1.5">1.5&nbsp;&nbsp;联系方式</A></H2>
+<P>作者：罗聪<BR>主页：<A 
+href="http://www.luocong.com/">http://www.luocong.com/</A><BR>E-Mail：admin[AT]luocong.com 
+</P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-3.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

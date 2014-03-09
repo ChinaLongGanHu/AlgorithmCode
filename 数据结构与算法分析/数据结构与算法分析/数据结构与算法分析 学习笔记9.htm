@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.luocong.com/dsaanotes/index-Z-H-10.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记9.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-9.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-11.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_9></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_9">第九章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_9">二叉搜索树</A></H1>
+<P></P><A name=node_sec_9.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_9.1">9.1&nbsp;&nbsp;基本概念</A></H2>
+<P>二叉树的一个重要的应用是它们在查找中的使用。二叉搜索树的概念相当容易理解，即：对于树中的每个结点X，它的左子树中所有关键字的值都小于X的关键字值，而它的右子树中的所有关键字值都大于X的关键字值。这意味着该树所有的元素都可以用某种统一的方式排序。</P>
+<P>例如下面就是一棵合法的二叉搜索树：</P>
+<P></P><PRE class=scheme>     <SPAN class=selfeval>6</SPAN>
+    <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>2</SPAN>   <SPAN class=selfeval>8</SPAN>
+  <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN> <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>4</SPAN>
+    <SPAN class=variable>/</SPAN>
+   <SPAN class=selfeval>3</SPAN>
+</PRE>
+<P></P>
+<P>二叉搜索树的性质决定了它在搜索方面有着非常出色的表现：要找到一棵树的最小结点，只需要从根结点开始，只要有左儿子就向左进行，终止结点就是最小的结点。找最大的结点则是往右进行。例如上面的例子中，最小的结点是1，在最左边；最大的结点是8，在最右边。</P>
+<P></P><A name=node_sec_9.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_9.2">9.2&nbsp;&nbsp;代码实现</A></H2>
+<P>二叉树的代码实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   bstree.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-17 22:53:52</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__BINARY_SEARCH_TREE_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__BINARY_SEARCH_TREE_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../btree/src/btree.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CBSTree</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;
+{
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>FindMin</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>FindMax</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>FindMin</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>FindMax</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>);
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &lt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &gt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>FindMin</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>FindMin</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>FindMin</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>FindMin</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>FindMax</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>FindMax</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>FindMax</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>FindMax</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+        <SPAN class=keyword>else</SPAN>
+        {
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>)
+            {
+                <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+                <SPAN class=variable>m_pNodeRoot-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            }
+        }
+    }
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &lt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+    }
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &gt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+    }
+    <SPAN class=comment>// else data is in the tree already, we'll do nothing!</SPAN>
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=comment>// Error! data not found!</SPAN>
+    }
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &lt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+    }
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &gt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+    }
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)   <SPAN class=comment>// found it, and it has two children</SPAN>
+    {
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>FindMin</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmp-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+    }
+    <SPAN class=keyword>else</SPAN>    <SPAN class=comment>// found it, and it has one or zero children</SPAN>
+    {
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmp</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)
+            <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>;
+        <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)
+            <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>;
+
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmp-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;
+
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pTmp</SPAN>)
+            <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>pTmp</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __BINARY_SEARCH_TREE_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   bstree.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-17 22:55:12</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"bstree.h"</SPAN>
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>bstree</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>bstree.Insert</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>bstree.Insert</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>bstree.Insert</SPAN>(<SPAN class=selfeval>3</SPAN>);
+
+    <SPAN class=variable>bstree.Delete</SPAN>(<SPAN class=selfeval>1</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_9.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_9.3">9.3&nbsp;&nbsp;说明</A></H2>
+<P>我的二叉搜索树是从二叉树继承而来的，我写了Find()、FindMin()、FindMax()、Insert()和Delete()一共5个成员函数。这里要说的是，对非线性数据结构的操作总是特别的不直观，因为一般来说我们会选择使用递归——而人脑一般不太容易“调试”递归的程序——如果递归的层数比较少（例如只有1、2次）那还好点，但一旦超过5、6次，恐怕人脑的“堆栈”就要溢出了。</P>
+<P>好了，牢骚完毕，来解释一下：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>Find()：如果树为空，则返回NULL；如果根结点比它的左儿子要小，就往左进行，否则如果比右儿子小就往右进行，一直到既不大于也不小于它的儿子为止，那么这个结点就一定是我们要找的了。 
+  </P>
+  <LI>
+  <P>FindMin()：从根结点开始，只要有左儿子就向左进行，直到遇到终止结点为止。 </P>
+  <LI>
+  <P>FindMax()：除分支朝右儿子进行外，其余过程与FindMin()相同。 </P>
+  <LI>
+  <P>Insert()：如果找到了相同的元素，则什么都不做；否则，递归查找到遍历路径的最后一点上，然后执行Insert操作。 </P>
+  <LI>
+  <P>Delete()：正如许多数据结构一样，最困难的操作是删除。删除的操作可以分成下面几种情况： </P>
+  <UL>
+    <LI>
+    <P>如果结点是一片树叶，那么它可以被立即删除。 </P>
+    <LI>
+    <P>如果结点有一个儿子，那么该结点可以在其父结点调整指针绕过该结点后被删除。 </P>
+    <LI>
+    <P>最复杂的情况是处理具有两个儿子的结点。我们可以用其右子树的最小的数据（很容易找到）代替该结点的数据，并递归地删除那个结点。为什么？因为一个结点肯定比它的右子树的所有结点都小，同时又比它的左子树的所有结点都大，所以我们只要在其右子树中找到最小的那个结点来代替它，就能满足二叉树的性质了。（根据这个规则，我们还可以用其左子树的最大的数据来代替该结点的数据，道理是一样的，不再叙述） 
+    </P></LI></UL>
+  <P></P></LI></OL>
+<P></P>
+<P>说了那么多，估计我还是没有讲清楚（主要是有点抽象），请读者编译我的代码并亲自动手调试一下吧。我的测试代码没有输出结果，因为要写个打印二叉树的函数我觉得有点烦，您可以在相应的函数中下断点，我个人认为只要能弄懂Delete()函数，那别的应该都没问题了。:) 
+</P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-9.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-11.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

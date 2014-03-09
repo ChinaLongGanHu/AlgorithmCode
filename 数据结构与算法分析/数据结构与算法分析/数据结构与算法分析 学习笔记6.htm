@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-7.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记6.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-6.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-8.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_6></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_6">第六章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_6">队列</A></H1>
+<P></P><A name=node_sec_6.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_6.1">6.1&nbsp;&nbsp;基本概念</A></H2>
+<P>像栈一样，队列（queue）也是表。然而，使用队列时插入在一端进行而删除则在另一端进行，也就是先进先出（FIFO）。队列的基本操作是EnQueue（入队），它是在表的末端（叫做队尾（rear））插入一个元素；还有DeQueue（出队），它是删除（或返回）在表的开头（叫做队头（front））的元素。</P>
+<P>队列一般有链式队列和循环队列两种。链式队列相当于我们在银行中排队，后来的人排到队伍的最后，前面的人办理完业务后就会离开，让下一个人进去；循环队列则跟循环链表很相似。</P>
+<P>我在此只写出链式队列的代码，循环队列其实也可以继承自循环链表，就不多罗嗦了。可以看到，队列的实现也是惊人的简单。</P>
+<P></P><A name=node_sec_6.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_6.2">6.2&nbsp;&nbsp;代码实现</A></H2>
+<P>队列的实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   lqueue.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-8 16:49:54</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__LIST_QUEUE_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__LIST_QUEUE_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../slist/src/slist.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CLQueue</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;
+{
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>EnQueue</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=variable>T</SPAN>   <SPAN class=variable>DeQueue</SPAN>();
+    <SPAN class=variable>T&amp;</SPAN>  <SPAN class=variable>GetFront</SPAN>();
+    <SPAN class=variable>T</SPAN>   <SPAN class=variable>GetFront</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T&amp;</SPAN>  <SPAN class=variable>GetRear</SPAN>();
+    <SPAN class=variable>T</SPAN>   <SPAN class=variable>GetRear</SPAN>() <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>EnQueue</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>AddTail</SPAN>(<SPAN class=variable>data</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>DeQueue</SPAN>()
+{
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetHead</SPAN>();
+    <SPAN class=variable>RemoveHead</SPAN>();
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetFront</SPAN>()
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetHead</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetFront</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetHead</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRear</SPAN>()
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetTail</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRear</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetTail</SPAN>();
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __LIST_QUEUE_H__</SPAN></PRE>
+<P></P>
+<P>调用如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   queue.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-8 17:00:40</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"lqueue.h"</SPAN>
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>queue</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>queue.EnQueue</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>queue.EnQueue</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>queue.EnQueue</SPAN>(<SPAN class=selfeval>3</SPAN>);
+
+    <SPAN class=keyword>while</SPAN> (<SPAN class=variable>!queue.IsEmpty</SPAN>())
+        <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>queue.DeQueue</SPAN>() &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}
+</PRE>
+<P></P>
+<P></P><A name=node_sec_6.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_6.3">6.3&nbsp;&nbsp;应用</A></H2>
+<P>队列的应用一般来说是模拟现实生活中的一些离散现象，例如银行排队、打印机任务、接线员工作等等。还有的就是使用队列来提高运行效率的算法，这些一般是在图算法中使用到。考虑到队列的应用要么是比较简单，要么是在特定的环境中进行，因此我就不给出应用的例子了，如果您有兴趣的话可以自行试试。 
+</P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-6.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-8.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

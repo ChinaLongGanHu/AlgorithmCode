@@ -1,0 +1,770 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.luocong.com/dsaanotes/index-Z-H-13.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔12.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-12.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-14.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_12></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_12">第十二章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_12">图的储存</A></H1>
+<P></P><A name=node_sec_12.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_12.1">12.1&nbsp;&nbsp;基本概念</A></H2>
+<P>图（Graph）是数据结构中的最后一个“堡垒”——攻下它，数据结构就结束了。但就像在打游戏的最终BOSS一样，BOSS肯定是最强的，图也一样，它比线性表和树都更为复杂。在线性表中，数据元素间仅有线性关系，每个数据元素只有一个直接前驱和一个直接后继，也就是“一对一”的关系；在树形结构中，数据元素之间有着比较明显的层次关系，并且每一层上的数据元素可能和下一层中多个元素（儿子）相关，但只能和上一层中的一个元素（父亲）相关，也就是它是“一对多”的关系。到了图形结构中，数据元素之间的关系就可以是任意的，图中任意两个数据元素之间都可能相关，即“多对多”的关系。因此，图在200多年的发展中，应用极其广泛。这也造成了大部分高级的算法分析都不可避免地要用到图的知识。</P>
+<P>不管图形结构有多复杂，我们要做的第一步必定是要先把它用某种结构储存起来。关于这一点，我们在树里面已经有了体会——对树的学习，关键是学习如何建树以及排序。我们要透过现象看本质，别看书里唧歪了半天，列了好多种储存图的方法，但其核心其实只有一个，那就是邻接矩阵（Adjacency 
+Matrix）。但邻接矩阵的缺点是它对空间的耗费比较大，因为它是用一个二维数组来储存图的顶点和边的信息的——如果有N个顶点，则需要有N ^ 
+2的空间来储存。因此，如果图是稀疏的，那么我们就可以用邻接表（Adjacency List）来储存它，充分发挥链表的动态规划空间的优点。</P>
+<P>下面我就分别给出这两种结构的代码实现。其中，邻接表使用了前面所写的单链表的类，因此在具体的实现上并不会太困难。另外，由于图结构本身比较复杂的原因，我无法把基类写得十分具有通用性，但它们应该已经可以基本满足后面的学习的需要了。</P>
+<P></P><A name=node_sec_12.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_12.2">12.2&nbsp;&nbsp;邻接矩阵</A></H2>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   MatrixGraph.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-27 0:01:12</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__MATRIX_GRAPH_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__MATRIX_GRAPH_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>assert.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>crtdbg.h</SPAN>&gt;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>_NORMAL_BLOCK</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>THIS_FILE</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>__LINE__</SPAN>)
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN>
+<SPAN class=keyword>#undef</SPAN> <SPAN class=variable>THIS_FILE</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>THIS_FILE</SPAN>[] <SPAN class=variable>=</SPAN> <SPAN class=variable>__FILE__</SPAN>;
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>  <SPAN class=variable>assert</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#else</SPAN>   <SPAN class=comment>// not _DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// _DEBUG</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>
+{
+    <SPAN class=variable>friend</SPAN> <SPAN class=variable>ostream&amp;</SPAN> <SPAN class=variable>operator</SPAN>&lt;&lt;(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt; <SPAN class=variable>&amp;g</SPAN>);
+
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nEdgeNum</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>;
+    <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>*m_Vertex</SPAN>;
+    <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>**m_Edge</SPAN>;
+    <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>m_NoVertex</SPAN>;
+    <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CMatrixGraph</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nMaxVertexNum</SPAN>);
+    <SPAN class=variable>~CMatrixGraph</SPAN>();
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetVertexNum</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetEdgeNum</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T_Vertex&amp;</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=variable>T_Vertex</SPAN>  <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T_Edge&amp;</SPAN> <SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=variable>T_Edge</SPAN>  <SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*nIndex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>InsertVertex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>InsertEdge</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>&amp;e</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetNextAdjVertexIndex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nn</SPAN>) <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>CMatrixGraph</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nMaxVertexNum</SPAN>)
+                                     : <SPAN class=variable>m_nVertexNum</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN>
+                                       <SPAN class=variable>m_nEdgeNum</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN>
+                                       <SPAN class=variable>m_nMaxVertexNum</SPAN>(<SPAN class=variable>nMaxVertexNum</SPAN>)<SPAN class=keyword>,</SPAN>
+                                       <SPAN class=variable>m_NoVertex</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=comment>// this can be customized</SPAN>
+                                       <SPAN class=variable>m_NoEdge</SPAN>(<SPAN class=selfeval>0</SPAN>)    <SPAN class=comment>// this can be customized</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=variable>m_Edge</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>T_Edge*</SPAN>[<SPAN class=variable>nMaxVertexNum</SPAN>];
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_Edge</SPAN>)
+        <SPAN class=keyword>return</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nMaxVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>T_Edge</SPAN>[<SPAN class=variable>nMaxVertexNum</SPAN>];
+    }
+
+    <SPAN class=variable>m_Vertex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>T_Vertex</SPAN>[<SPAN class=variable>nMaxVertexNum</SPAN>];
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>~CMatrixGraph</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>delete</SPAN>[] <SPAN class=variable>m_Vertex</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>m_nMaxVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>delete</SPAN>[] <SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>i</SPAN>];
+    }
+    <SPAN class=keyword>delete</SPAN>[] <SPAN class=variable>m_Edge</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>Find</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>*nIndex</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>v</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_Vertex</SPAN>[<SPAN class=variable>i</SPAN>])
+        {
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>nIndex</SPAN>)
+                <SPAN class=variable>*nIndex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>i</SPAN>;
+            <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+        }
+    }
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>InsertVertex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=variable>m_nVertexNum</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>) || <SPAN class=variable>Find</SPAN>(<SPAN class=variable>v</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>m_Vertex</SPAN>[<SPAN class=variable>m_nVertexNum</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>v</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>m_nMaxVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+        <SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>m_nVertexNum</SPAN>][<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+    <SPAN class=variable>++m_nVertexNum</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>InsertEdge</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v1</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v2</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>&amp;e</SPAN>
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nIndexV1</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nIndexV2</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (
+        (<SPAN class=variable>v1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>v2</SPAN>) ||
+        (<SPAN class=variable>!Find</SPAN>(<SPAN class=variable>v1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;nIndexV1</SPAN>)) ||
+        (<SPAN class=variable>!Find</SPAN>(<SPAN class=variable>v2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;nIndexV2</SPAN>)) ||
+        (<SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>nIndexV1</SPAN>][<SPAN class=variable>nIndexV2</SPAN>] <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_NoEdge</SPAN>)
+    )
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>nIndexV1</SPAN>][<SPAN class=variable>nIndexV2</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=variable>e</SPAN>;
+    <SPAN class=variable>++m_nEdgeNum</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T_Edge&amp;</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>
+)
+{
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>nVertexIndex</SPAN>) || (<SPAN class=variable>nVertexIndex</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) || (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;m_Edge</SPAN>[<SPAN class=variable>nVertexIndex</SPAN>][<SPAN class=variable>n</SPAN>]);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>nVertexIndex</SPAN>) || (<SPAN class=variable>nVertexIndex</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) || (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoEdge</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>nVertexIndex</SPAN>][<SPAN class=variable>n</SPAN>];
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T_Vertex&amp;</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) || (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoVertex</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;m_Vertex</SPAN>[<SPAN class=variable>n</SPAN>]);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) || (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nMaxVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_NoVertex</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_Vertex</SPAN>[<SPAN class=variable>n</SPAN>];
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexNum</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeNum</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_nEdgeNum</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>m_nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>n</SPAN>][<SPAN class=variable>i</SPAN>] <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_NoEdge</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=variable>i</SPAN>;
+    }
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetNextAdjVertexIndex</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nn</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>nn</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>m_nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>m_Edge</SPAN>[<SPAN class=variable>n</SPAN>][<SPAN class=variable>i</SPAN>] <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_NoEdge</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=variable>i</SPAN>;
+    }
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;operator</SPAN>&lt;&lt;(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt; <SPAN class=variable>&amp;g</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN>;
+
+    <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>g.GetVertexNum</SPAN>();
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>j</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++j</SPAN>)
+        {
+            <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=variable>g.GetEdgeAt</SPAN>(<SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>j</SPAN>) &lt;&lt; <SPAN class=selfeval>' '</SPAN>;
+        }
+        <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>os</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __MATRIX_GRAPH_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   MatrixGraph.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-27 0:02:03</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"MatrixGraph.h"</SPAN>
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CMatrixGraph</SPAN>&lt;<SPAN class=keyword>int</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>mgraph</SPAN>(<SPAN class=selfeval>4</SPAN>);
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=comment>// (1)－－&gt;(2)</SPAN>
+    <SPAN class=comment>// ｜↖</SPAN>
+    <SPAN class=comment>// ｜  ﹨</SPAN>
+    <SPAN class=comment>// ↓    ﹨</SPAN>
+    <SPAN class=comment>// (3)－－&gt;(4)</SPAN>
+    <SPAN class=variable>mgraph.InsertVertex</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>mgraph.InsertVertex</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>mgraph.InsertVertex</SPAN>(<SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>mgraph.InsertVertex</SPAN>(<SPAN class=selfeval>4</SPAN>);
+    <SPAN class=variable>mgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>mgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>mgraph.InsertEdge</SPAN>(<SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>mgraph.InsertEdge</SPAN>(<SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>mgraph</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_12.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_12.3">12.3&nbsp;&nbsp;邻接链表</A></H2>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   ListGraph.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-27 10:26:20</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__LIST_GRAPH_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__LIST_GRAPH_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../slist/src/slist.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CListGraph</SPAN>
+{
+    <SPAN class=variable>friend</SPAN> <SPAN class=variable>ostream&amp;</SPAN> <SPAN class=variable>operator</SPAN>&lt;&lt;(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt; <SPAN class=variable>&amp;g</SPAN>);
+
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=keyword>typedef</SPAN> <SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagLGEdge</SPAN>
+    {
+        <SPAN class=keyword>int</SPAN> <SPAN class=variable>nextvertexindex</SPAN>;
+        <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>edata</SPAN>;
+    } <SPAN class=variable>LGEdge</SPAN>;
+
+    <SPAN class=keyword>typedef</SPAN> <SPAN class=keyword>struct</SPAN> <SPAN class=variable>tagLGVertex</SPAN>
+    {
+        <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>vdata</SPAN>;
+        <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>LGEdge</SPAN>&gt; <SPAN class=variable>*edgelist</SPAN>;
+    } <SPAN class=variable>LGVertex</SPAN>;
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nEdgeNum</SPAN>;
+    <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>LGVertex</SPAN>&gt; <SPAN class=variable>m_Vertex</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CListGraph</SPAN>();
+    <SPAN class=variable>~CListGraph</SPAN>();
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>Output</SPAN>(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN>) <SPAN class=keyword>const</SPAN>;
+
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>*vertex</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>*edge</SPAN>) <SPAN class=keyword>const</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetVertexNum</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetEdgeNum</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>*v</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>*e</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>Find</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*nIndex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>InsertVertex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>InsertEdge</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>&amp;e</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetNextAdjVertexIndex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nn</SPAN>) <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>CListGraph</SPAN>()
+                                   : <SPAN class=variable>m_nVertexNum</SPAN>(<SPAN class=selfeval>0</SPAN>)<SPAN class=keyword>,</SPAN>
+                                     <SPAN class=variable>m_nEdgeNum</SPAN>(<SPAN class=selfeval>0</SPAN>)
+{
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>~CListGraph</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+    <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>LGEdge</SPAN>&gt; <SPAN class=variable>*edgelist</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>edgelist</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_Vertex.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>)<SPAN class=variable>.edgelist</SPAN>;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>edgelist</SPAN>)
+        {
+            <SPAN class=variable>edgelist-</SPAN>&gt;<SPAN class=variable>RemoveAll</SPAN>();
+            <SPAN class=keyword>delete</SPAN> <SPAN class=variable>edgelist</SPAN>;
+        }
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexNum</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeNum</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_nEdgeNum</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>*vertex</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>vertex</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) || (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_Vertex.GetCount</SPAN>()))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>*vertex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_Vertex.GetAt</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetVertexAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>*v</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>v</SPAN>);
+
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>))
+    {
+        <SPAN class=variable>*v</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.vdata</SPAN>;
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+    }
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>*edge</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>edge</SPAN>);
+
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>vertex.edgelist</SPAN>)
+        <SPAN class=variable>nVertexEdgelistCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetCount</SPAN>();
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (
+        (<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>n</SPAN>) ||
+        (<SPAN class=variable>n</SPAN> &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>)
+    )
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>*edge</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetAt</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetEdgeAt</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>*e</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>e</SPAN>);
+
+    <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>edge</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>GetEdgeAt</SPAN>(<SPAN class=variable>nVertexIndex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;edge</SPAN>))
+    {
+        <SPAN class=variable>*e</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>edge.edata</SPAN>;
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+    }
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>Find</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>*nIndex</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_nVertexNum</SPAN>;
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>vertex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_Vertex.GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>v</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>vertex.vdata</SPAN>)
+        {
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>nIndex</SPAN>)
+                <SPAN class=variable>*nIndex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>i</SPAN>;
+            <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+        }
+    }
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>InsertVertex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v</SPAN>)
+{
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>Find</SPAN>(<SPAN class=variable>v</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>vertex.vdata</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>v</SPAN>;
+    <SPAN class=variable>vertex.edgelist</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>m_Vertex.AddTail</SPAN>(<SPAN class=variable>vertex</SPAN>);
+    <SPAN class=variable>++m_nVertexNum</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>InsertEdge</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v1</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;v2</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Edge</SPAN> <SPAN class=variable>&amp;e</SPAN>
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nIndexV1</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nIndexV2</SPAN>;
+    <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>edge</SPAN>;
+    <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>LGEdge</SPAN>&gt; <SPAN class=variable>*edgelist</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (
+        (<SPAN class=variable>v1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>v2</SPAN>) ||
+        (<SPAN class=variable>!Find</SPAN>(<SPAN class=variable>v1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;nIndexV1</SPAN>)) ||
+        (<SPAN class=variable>!Find</SPAN>(<SPAN class=variable>v2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;nIndexV2</SPAN>))
+    )
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=comment>// if there's no edges, let's create it first</SPAN>
+    <SPAN class=variable>edgelist</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_Vertex.GetAt</SPAN>(<SPAN class=variable>nIndexV1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>)<SPAN class=variable>.edgelist</SPAN>;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>edgelist</SPAN>)
+    {
+        <SPAN class=variable>edgelist</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>LGEdge</SPAN>&gt;;
+        <SPAN class=variable>m_Vertex.GetAt</SPAN>(<SPAN class=variable>nIndexV1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>)<SPAN class=variable>.edgelist</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>edgelist</SPAN>;
+    }
+
+    <SPAN class=comment>// is there an edge between v1 and v2 already?</SPAN>
+    <SPAN class=variable>nVertexEdgelistCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>edgelist-</SPAN>&gt;<SPAN class=variable>GetCount</SPAN>();
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexEdgelistCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>edge</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>edgelist-</SPAN>&gt;<SPAN class=variable>GetAt</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+        <SPAN class=keyword>if</SPAN> (
+            (<SPAN class=variable>edge.edata</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>e</SPAN>) <SPAN class=variable>&amp;&amp;</SPAN>
+            (<SPAN class=variable>edge.nextvertexindex</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>nIndexV2</SPAN>)
+        )
+            <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+    }
+
+    <SPAN class=comment>// new edge's data</SPAN>
+    <SPAN class=variable>edge.edata</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>e</SPAN>;
+    <SPAN class=variable>edge.nextvertexindex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>nIndexV2</SPAN>;
+
+    <SPAN class=variable>edgelist-</SPAN>&gt;<SPAN class=variable>AddTail</SPAN>(<SPAN class=variable>edge</SPAN>);
+
+    <SPAN class=variable>++m_nEdgeNum</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>vertex.edgelist</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetHead</SPAN>()<SPAN class=variable>.nextvertexindex</SPAN>;
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>GetNextAdjVertexIndex</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nn</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>edge</SPAN>;
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>vertex.edgelist</SPAN>)
+        <SPAN class=variable>nVertexEdgelistCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetCount</SPAN>();
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (
+        (<SPAN class=selfeval>0</SPAN> &gt; <SPAN class=variable>nn</SPAN>) ||
+        ((<SPAN class=variable>nn</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>) &gt;<SPAN class=variable>=</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>)
+    )
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>-1</SPAN>;
+
+    <SPAN class=variable>edge</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetAt</SPAN>((<SPAN class=variable>nn</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>) <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>edge.nextvertexindex</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>Output</SPAN>(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=variable>LGEdge</SPAN> <SPAN class=variable>edge</SPAN>;
+    <SPAN class=variable>LGVertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexEdgelistCount</SPAN>;
+
+    <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexNum</SPAN>();
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>))
+            <SPAN class=keyword>return</SPAN> ;
+        <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=selfeval>"(V"</SPAN> &lt;&lt; <SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN> &lt;&lt; <SPAN class=selfeval>") "</SPAN>;
+        <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=selfeval>'V'</SPAN> &lt;&lt; <SPAN class=variable>vertex.vdata</SPAN>;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>vertex.edgelist</SPAN>)
+            <SPAN class=variable>nVertexEdgelistCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetCount</SPAN>();
+        <SPAN class=keyword>else</SPAN>
+            <SPAN class=variable>nVertexEdgelistCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>j</SPAN> &lt; <SPAN class=variable>nVertexEdgelistCount</SPAN>; <SPAN class=variable>++j</SPAN>)
+        {
+            <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=selfeval>" --&gt; "</SPAN>;
+            <SPAN class=variable>edge</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>vertex.edgelist-</SPAN>&gt;<SPAN class=variable>GetAt</SPAN>(<SPAN class=variable>j</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+            <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=selfeval>'V'</SPAN> &lt;&lt; <SPAN class=variable>edge.nextvertexindex</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>;
+        }
+        <SPAN class=variable>os</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>ostream&amp;</SPAN> <SPAN class=variable>operator</SPAN>&lt;&lt;(<SPAN class=variable>ostream</SPAN> <SPAN class=variable>&amp;os</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt; <SPAN class=variable>&amp;g</SPAN>)
+{
+    <SPAN class=variable>g.Output</SPAN>(<SPAN class=variable>os</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>os</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __LIST_GRAPH_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   ListGraph.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-27 10:27:55</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"ListGraph.h"</SPAN>
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=keyword>int</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>lgraph</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=comment>// (1)－－&gt;(2)</SPAN>
+    <SPAN class=comment>// ｜↖</SPAN>
+    <SPAN class=comment>// ｜  ﹨</SPAN>
+    <SPAN class=comment>// ↓    ﹨</SPAN>
+    <SPAN class=comment>// (3)－－&gt;(4)</SPAN>
+    <SPAN class=variable>lgraph.InsertVertex</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>lgraph.InsertVertex</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>lgraph.InsertVertex</SPAN>(<SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>lgraph.InsertVertex</SPAN>(<SPAN class=selfeval>4</SPAN>);
+    <SPAN class=variable>lgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>lgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>lgraph.InsertEdge</SPAN>(<SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>lgraph.InsertEdge</SPAN>(<SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>lgraph</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}</PRE>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-12.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-14.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

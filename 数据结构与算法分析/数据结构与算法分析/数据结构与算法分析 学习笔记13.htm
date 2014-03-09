@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.luocong.com/dsaanotes/index-Z-H-14.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记13.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-13.htm">上一页</A></SPAN><SPAN 
+class=disable>, 下一页</SPAN><SPAN>; &nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_13></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_13">第十三章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_13">图的遍历</A></H1>
+<P></P><A name=node_sec_13.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_13.1">13.1&nbsp;&nbsp;基本概念</A></H2>
+<P>解决了图的储存问题后，接下来的肯定就是解决如何去访问图上面的元素的问题了，也就是图的遍历。书里面对图的遍历是用深度优先搜索算法（Depth First 
+Search，简称DFS）和广度优先搜索算法（Breadth First 
+Search，简称BFS），其实说白了就是按照“分层”的思想来进行。深度优先就是先访问完最深层次的数据元素，广度优先就是先访问完同一层次的数据元素，它们的时间复杂度都是一样的，只是访问元素的顺序不同而已。</P>
+<P></P><A name=node_sec_13.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_13.2">13.2&nbsp;&nbsp;代码实现</A></H2>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   TraverseGraph.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-29 16:28:44</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__TRAVERSE_GRAPH_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__TRAVERSE_GRAPH_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../ListGraph/src/ListGraph.h"</SPAN>
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../queue/src/lqueue.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CTraverseGraph</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CListGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+{
+<SPAN class=keyword>protected</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>*m_nVisited</SPAN>;
+
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>InitializeVisited</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>FinalizeVisited</SPAN>();
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>DFS</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>)) <SPAN class=keyword>const</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>DFS</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>));
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>BFS</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>));
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>InitializeVisited</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+
+    <SPAN class=variable>m_nVisited</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=keyword>int</SPAN>[<SPAN class=variable>n</SPAN>];
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_nVisited</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>n</SPAN>; <SPAN class=variable>++i</SPAN>)
+        <SPAN class=variable>m_nVisited</SPAN>[<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>FinalizeVisited</SPAN>()
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>m_nVisited</SPAN>)
+    {
+        <SPAN class=keyword>delete</SPAN>[] <SPAN class=variable>m_nVisited</SPAN>;
+        <SPAN class=variable>m_nVisited</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>DFS</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>)
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN>;
+    <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+
+    <SPAN class=variable>m_nVisited</SPAN>[<SPAN class=variable>n</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+
+    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>);
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>nRetCode</SPAN>)
+        <SPAN class=keyword>return</SPAN> ;
+    <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>vertex</SPAN>);
+
+    <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(<SPAN class=variable>n</SPAN>);
+    <SPAN class=keyword>for</SPAN> (; <SPAN class=variable>i</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=selfeval>-1</SPAN>; <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetNextAdjVertexIndex</SPAN>(<SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>j++</SPAN>))
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!m_nVisited</SPAN>[<SPAN class=variable>i</SPAN>])
+            <SPAN class=variable>DFS</SPAN>(<SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>DFS</SPAN>(
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>)
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN>;
+
+    <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexNum</SPAN>();
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!InitializeVisited</SPAN>(<SPAN class=variable>nVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> ;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!m_nVisited</SPAN>[<SPAN class=variable>i</SPAN>])
+            <SPAN class=variable>DFS</SPAN>(<SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+    }
+
+    <SPAN class=variable>FinalizeVisited</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>typename</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>T_Vertex</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>T_Edge</SPAN>&gt;::<SPAN class=variable>BFS</SPAN>(
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>&amp;vertex</SPAN>)
+)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>j</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>k</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>l</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nVertexNum</SPAN>;
+    <SPAN class=variable>T_Vertex</SPAN> <SPAN class=variable>vertex</SPAN>;
+    <SPAN class=variable>CLQueue</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>queue</SPAN>;
+
+    <SPAN class=variable>nVertexNum</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexNum</SPAN>();
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!InitializeVisited</SPAN>(<SPAN class=variable>nVertexNum</SPAN>))
+        <SPAN class=keyword>return</SPAN> ;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>nVertexNum</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>m_nVisited</SPAN>[<SPAN class=variable>i</SPAN>])
+            <SPAN class=keyword>continue</SPAN>;
+
+        <SPAN class=comment>// visit vertex[i]</SPAN>
+        <SPAN class=variable>m_nVisited</SPAN>[<SPAN class=variable>i</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+        <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>i</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>nRetCode</SPAN>)
+            <SPAN class=keyword>return</SPAN> ;
+        <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>vertex</SPAN>);
+        <SPAN class=variable>queue.EnQueue</SPAN>(<SPAN class=variable>i</SPAN>);
+
+        <SPAN class=comment>// visit vertex[i]'s adjacency vertex(s)</SPAN>
+        <SPAN class=keyword>while</SPAN> (<SPAN class=variable>!queue.IsEmpty</SPAN>())
+        {
+            <SPAN class=variable>j</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>queue.DeQueue</SPAN>();    <SPAN class=comment>// equal to i above</SPAN>
+            <SPAN class=variable>k</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetFirstAdjVertexIndex</SPAN>(<SPAN class=variable>j</SPAN>);
+            <SPAN class=variable>l</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+            <SPAN class=comment>// adjacency vertex(s):</SPAN>
+            <SPAN class=keyword>for</SPAN> (; <SPAN class=variable>k</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=selfeval>-1</SPAN>; <SPAN class=variable>k</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetNextAdjVertexIndex</SPAN>(<SPAN class=variable>j</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>l++</SPAN>))
+            {
+                <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!m_nVisited</SPAN>[<SPAN class=variable>k</SPAN>])
+                {
+                    <SPAN class=variable>m_nVisited</SPAN>[<SPAN class=variable>k</SPAN>] <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+                    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetVertexAt</SPAN>(<SPAN class=variable>k</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;vertex</SPAN>);
+                    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>nRetCode</SPAN>)
+                        <SPAN class=keyword>return</SPAN> ;
+                    <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>vertex</SPAN>);
+                    <SPAN class=variable>queue.EnQueue</SPAN>(<SPAN class=variable>k</SPAN>);
+                }
+            }
+        }
+    }
+
+    <SPAN class=variable>FinalizeVisited</SPAN>();
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __TRAVERSE_GRAPH_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   TraverseGraph.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-29 16:30:34</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"TraverseGraph.h"</SPAN>
+
+<SPAN class=keyword>typedef</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>ElementType</SPAN>;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>PrintVertex</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>ElementType</SPAN> <SPAN class=variable>&amp;vertex</SPAN>)
+{
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>'V'</SPAN> &lt;&lt; <SPAN class=variable>vertex</SPAN> &lt;&lt; <SPAN class=selfeval>" --&gt; "</SPAN>;
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CTraverseGraph</SPAN>&lt;<SPAN class=variable>ElementType</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>ElementType</SPAN>&gt; <SPAN class=variable>tgraph</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=comment>//        (1)</SPAN>
+    <SPAN class=comment>//        /  \</SPAN>
+    <SPAN class=comment>//       /    \</SPAN>
+    <SPAN class=comment>//      /      \</SPAN>
+    <SPAN class=comment>//    (2)      (3)</SPAN>
+    <SPAN class=comment>//    / \      / \</SPAN>
+    <SPAN class=comment>//   /   \    /   \</SPAN>
+    <SPAN class=comment>// (4)   (5) (6)--(7)</SPAN>
+    <SPAN class=comment>//   \   /</SPAN>
+    <SPAN class=comment>//    \ /</SPAN>
+    <SPAN class=comment>//    (8)</SPAN>
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>4</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>5</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>6</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>7</SPAN>);
+    <SPAN class=variable>tgraph.InsertVertex</SPAN>(<SPAN class=selfeval>8</SPAN>);
+    <SPAN class=comment>// 因为CListGraph是一个有向图类，所以这里为了创建一个无向图，</SPAN>
+    <SPAN class=comment>// 必须把每条边从入边和出边两个方向分别创建一次：</SPAN>
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>5</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>5</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>2</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>6</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>6</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>7</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>7</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>3</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>6</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>7</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>7</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>6</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>8</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>8</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>4</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>5</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>8</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>tgraph.InsertEdge</SPAN>(<SPAN class=selfeval>8</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>5</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"Graph is:"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>tgraph</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"DFS Traverse:"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=variable>tgraph.DFS</SPAN>(<SPAN class=variable>PrintVertex</SPAN>);
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"NULL"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"BFS Traverse:"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=variable>tgraph.BFS</SPAN>(<SPAN class=variable>PrintVertex</SPAN>);
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"NULL"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_13.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_13.3">13.3&nbsp;&nbsp;说明</A></H2>
+<P>为了说明DFS和BFS，我另外写了一个类：CTraverseGraph，它继承于前面的邻接链表图类：CListGraph。呵呵，用C++的继承机制真是舒服啊，不用每次都重写一堆功能重复的代码了，而且它能更直观地表现出数据结构的ADT来，实在是居家旅行、跳槽单干的必备良器……嗯，扯远了，咳咳。另外，我之所以不把DFS和BFS这两个函数直接写到图的基类里面，是因为对图的遍历很难做到高度抽象的通用性，所以在这里就只写了一个试验级别的CTraverseGraph了，但是说实话，对于试验来说，它已经足够了。 
+</P>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-13.htm">上一页</A></SPAN><SPAN 
+class=disable>, 下一页</SPAN><SPAN>; &nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

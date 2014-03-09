@@ -1,0 +1,27 @@
+.table_border {
+	BORDER-RIGHT: #6b9ad6 1px solid; BORDER-TOP: #6b9ad6 1px solid; MARGIN-TOP: 5px; BORDER-LEFT: #6b9ad6 1px solid; BORDER-BOTTOM: #6b9ad6 1px solid
+}
+.tb_list {
+	BORDER-BOTTOM: #c4c4c4 1px solid; HEIGHT: 28px
+}
+.tb_list1 {
+	BORDER-BOTTOM: #c4c4c4 1px solid; HEIGHT: 28px
+}
+.tb_topic {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 0px; PADDING-TOP: 2px; HEIGHT: 18px
+}
+.tb_topic1 {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 0px; PADDING-TOP: 2px; HEIGHT: 18px
+}
+.tb_bgcolor {
+	BACKGROUND-COLOR: #d6ebff
+}
+.tb_topic {
+	BACKGROUND-COLOR: #d6ebff
+}
+.tb_bgcolor1 {
+	BACKGROUND-COLOR: #f0f8ff
+}
+.tb_list {
+	BACKGROUND-COLOR: #f0f8ff
+}

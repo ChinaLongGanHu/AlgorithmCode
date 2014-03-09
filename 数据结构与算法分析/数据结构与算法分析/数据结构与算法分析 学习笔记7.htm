@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-8.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记7.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-7.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-9.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_7></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_7">第七章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_7">递归</A></H1>
+<P></P><A name=node_sec_7.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.1">7.1&nbsp;&nbsp;基本概念</A></H2>
+<P>按照原书的流程，现在应该讲到递归了。递归是一种有力的数学工具。不知道各位学过Lisp或者它的方言没有（例如Scheme），如果学过的话，一定会对递归非常熟悉，因为在Lisp和它的方言中，是没有循环语句的，如果您要构造一个循环，必须通过递归的形式来实现。当时我的脑袋怎么也转不过弯来，因为我已经习惯了在C/C++里面使用for、while等语句来循环了，在Lisp里面刚开始我几乎没有办法写出一个不出错的循环来。</P>
+<P>例如，下面的代码：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=keyword>for</SPAN> (<SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=selfeval>10</SPAN>; <SPAN class=variable>++i</SPAN>)
+{
+}
+</PRE></DIV>
+<P></P>
+<P>可以被转换成递归：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=keyword>void</SPAN> <SPAN class=variable>recursion_loop</SPAN>(<SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=selfeval>10</SPAN>)
+        <SPAN class=keyword>return</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=variable>recursion_loop</SPAN>(<SPAN class=variable>i</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=selfeval>1</SPAN>);
+}
+
+<SPAN class=comment>// 调用：</SPAN>
+<SPAN class=variable>recursion_loop</SPAN>(<SPAN class=selfeval>0</SPAN>);
+</PRE></DIV>
+<P></P>
+<P>递归具有以下的性质：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>递归就是在某个过程中重复调用它本身。例如在上面的例子中，就是在recursion_loop()这个函数中再调用它本身。 </P>
+  <LI>
+  <P>必须有停止条件。这很容易理解，因为如果没有停止条件的话，那么这个递归就会子子孙孙无穷溃也。例如在上面的例子中，<CODE 
+  class=scheme><SPAN class=keyword>if</SPAN> (<SPAN class=variable>i</SPAN> 
+  <SPAN class=variable>==</SPAN> <SPAN class=selfeval>10</SPAN>)</CODE> 就是停止的条件。 
+  </P>
+  <LI>
+  <P>递归会受到现实中的限制，例如栈的大小不够而导致失败。这是因为在计算机中，栈的大小是有上限的，而每次递归调用函数本身，都需要在栈中保存返回地址、参数等信息，在经过N次递归之后，栈很可能就会满了，这样就会导致无法进行第(N+1)次递归。 
+  </P></LI></OL>
+<P></P>
+<P>根据上面的性质3我们可以知道，并不是所有的语言都支持递归的——如果某种语言能够支持递归，那么它必须是支持“栈”这种结构的。目前就我所知道的对递归的使用发挥得最淋漓尽致的语言，Lisp和它的方言是当之无愧的王者。</P>
+<P></P><A name=node_sec_7.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.2">7.2&nbsp;&nbsp;应用</A></H2>
+<P>唉，本来都不想写递归的例子了，因为这些例子已经被写过无数次。提到递归，就一定会说到阶乘、斐波那契数列和汉诺塔这三个例子，但本着把教科书过一遍的目的，我还是再进行一次重复劳动吧（但不再对这三个例子进行讲解了，随便找一本数据结构的书都会有这方面的内容）。最后增加一个帕斯卡三角形，在我国也就是著名的杨辉三角。</P>
+<P></P><A name=node_sec_7.2.1></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.2.1">7.2.1&nbsp;&nbsp;阶乘</A></H3>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   factorial.c</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-8 21:23:16</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>factorial</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>n</SPAN> || <SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>?</SPAN> <SPAN class=selfeval>1</SPAN>  : <SPAN class=variable>n</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=variable>factorial</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>);
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>long</SPAN> <SPAN class=variable>lResult</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>factorial</SPAN>(<SPAN class=selfeval>10</SPAN>);
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"%ld\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>lResult</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_7.2.2></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.2.2">7.2.2&nbsp;&nbsp;斐波那契数列</A></H3>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   fib.c</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-8 21:28:56</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>fib</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>n</SPAN> || <SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>n</SPAN> <SPAN class=variable>?</SPAN> <SPAN class=selfeval>1</SPAN> : <SPAN class=variable>fib</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>) <SPAN class=variable>+</SPAN> <SPAN class=variable>fib</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>2</SPAN>);
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>long</SPAN> <SPAN class=variable>lResult</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>fib</SPAN>(<SPAN class=selfeval>10</SPAN>);
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"%ld\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>lResult</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_7.2.3></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.2.3">7.2.3&nbsp;&nbsp;汉诺塔</A></H3>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   hanoi.c</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-8 21:40:44</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>move</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>z</SPAN>)
+{
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"把圆盘 %d 从柱子 %c 移动到 %c 上\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>z</SPAN>);
+}
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>hanoi</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>y</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>z</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>n</SPAN>)
+        <SPAN class=variable>move</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>z</SPAN>);          <SPAN class=comment>// 如果只有一个盘，则直接将它从x移动到z</SPAN>
+    <SPAN class=keyword>else</SPAN>
+    {
+        <SPAN class=variable>hanoi</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>z</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>y</SPAN>);  <SPAN class=comment>// 把1 ~ n - 1个盘从x移动到y，用z作为中转</SPAN>
+        <SPAN class=variable>move</SPAN>(<SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>n</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>z</SPAN>);          <SPAN class=comment>// 把第n个盘从x移动到z</SPAN>
+        <SPAN class=variable>hanoi</SPAN>(<SPAN class=variable>n</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>y</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>x</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>z</SPAN>);  <SPAN class=comment>// 把1 ~ n - 1个盘从y移动到z，用x作为中转</SPAN>
+    }
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>hanoi</SPAN>(<SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>'X'</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>'Y'</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=selfeval>'Z'</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_7.2.4></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_7.2.4">7.2.4&nbsp;&nbsp;帕斯卡三角形（杨辉三角）</A></H3>
+<P>下面的数值被称为帕斯卡三角形，在我国则是著名的杨辉三角：</P>
+<P></P>
+<DIV align=left><PRE class=scheme>    <SPAN class=selfeval>1</SPAN>
+    <SPAN class=selfeval>1</SPAN>    <SPAN class=selfeval>1</SPAN>
+    <SPAN class=selfeval>1</SPAN>    <SPAN class=selfeval>2</SPAN>    <SPAN class=selfeval>1</SPAN>
+    <SPAN class=selfeval>1</SPAN>    <SPAN class=selfeval>3</SPAN>    <SPAN class=selfeval>3</SPAN>    <SPAN class=selfeval>1</SPAN>
+    <SPAN class=selfeval>1</SPAN>    <SPAN class=selfeval>4</SPAN>    <SPAN class=selfeval>6</SPAN>    <SPAN class=selfeval>4</SPAN>    <SPAN class=selfeval>1</SPAN>
+</PRE></DIV>
+<P></P>
+<P>三角形边界上的数都是1，内部的每个数是位于它上面的两个数之和。</P>
+<P>利用递归我们可以很容易地把问题转换为这个性质：</P>
+<P>假设f(row, col)表示杨辉三角的第row行的第col个元素，那么：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>f(row, col) = 1 (col = 1 或者 row = col)，也就是递归的停止条件。 </P>
+  <LI>
+  <P>f(row, col) = f(row - 1, col - 1) + f(row - 1, col)，也就是上一行的两个相邻元素的和。 
+  </P></LI></OL>
+<P></P>
+<P>有了这个性质，我们的递归程序就容易写了。^_^</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   pascaltriangle.c</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-9 14:53:57</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>GetElement</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>row</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>col</SPAN>)
+{
+    <SPAN class=comment>// 每行的外围两个元素为1</SPAN>
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>col</SPAN>) || (<SPAN class=variable>row</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>col</SPAN>))
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=comment>// 其余的部分为上一行的(col - 1)和(col)元素之和</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetElement</SPAN>(<SPAN class=variable>row</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>col</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>) <SPAN class=variable>+</SPAN> <SPAN class=variable>GetElement</SPAN>(<SPAN class=variable>row</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>col</SPAN>);
+}
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>PascalTriangle</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>long</SPAN> <SPAN class=variable>n</SPAN>)
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>row</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>col</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>row</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>row</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>n</SPAN>; <SPAN class=variable>++row</SPAN>)
+    {
+        <SPAN class=keyword>for</SPAN> (<SPAN class=variable>col</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>col</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>row</SPAN>; <SPAN class=variable>++col</SPAN>)
+            <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>" %4ld"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>GetElement</SPAN>(<SPAN class=variable>row</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>col</SPAN>));
+        <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"\n"</SPAN>);
+    }
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>PascalTriangle</SPAN>(<SPAN class=selfeval>5</SPAN>);
+}</PRE>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-7.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-9.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

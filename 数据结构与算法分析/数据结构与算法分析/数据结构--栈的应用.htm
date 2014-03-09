@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0047)http://www.programfan.com/club/post-215954.html -->
+<HTML><HEAD><TITLE>数据结构--栈的应用 — 编程爱好者论坛 bbs.programfan.com</TITLE><LINK 
+href="数据结构--栈的应用.files/style.css" rel=stylesheet><LINK 
+href="数据结构--栈的应用.files/style1.css" rel=stylesheet>
+<META http-equiv=Content-Type content="text/html; charset=gb2312">
+<SCRIPT src="数据结构--栈的应用.files/ajax.js" type=text/javascript></SCRIPT>
+
+<SCRIPT type=text/javascript>
+<!--
+var currentpos,timer;
+function sc()
+{
+	clearInterval(timer);
+}
+
+function initialize()
+{
+	timer=setInterval("scrollwindow()",10);
+}
+
+function scrollwindow()
+{
+	currentpos=document.body.scrollTop;window.scroll(0,++currentpos);
+}
+
+//document.onmousedown=sc
+//document.ondblclick=initialize
+
+var newWindow=null
+function subwin(loadpos,target,width,height)
+{
+	if(!newWindow||newWindow.closed)
+		{
+		newWindow=window.open(loadpos,target,"resizable,scrollbars,dependent,width="+width+",height="+height);
+		}
+	else
+		{
+		newWindow.focus();
+		}
+}
+
+function check()
+{
+	if(document.frmedit.content.value==""){
+	alert("请输入内容");
+	return false;
+	}
+	if(document.frmedit.content.value.length>5000){
+	alert("内容超过5000字，请分割发送");
+	document.frmedit.content.focus();
+	return false;
+	}
+	document.frmedit.Submit.disabled=true;
+	return true;
+	document.form.submit();
+}
+
+function SaveAs(ID)
+{
+   if(document.execCommand)
+    {
+	var savewindow=window.open("showtxt.asp?id=215954");
+	savewindow.document.execCommand('SaveAs',true,'Pfan_'+ID+'.htm');
+	savewindow.close();
+	}
+   else
+   	alert('SaveAs Function Not Supported by Browser');
+}
+
+function movebbs(id)
+{
+	document.movebbs.submit();
+}
+
+function bbsaction(type)
+{
+	switch(type)
+	{
+	case 1: document.bbsaction.action.value="urgency";break;
+	case 2: document.bbsaction.action.value="lock";break;
+	case 3: document.bbsaction.action.value="over";break;
+	default:break;
+	}
+	document.bbsaction.submit();
+}
+
+function jump(page)
+{
+	
+		location.href="post-215954-"+page+".html";
+	
+}
+
+function ResizeImage(img){
+	if (img.width>500)
+	{
+		scale = img.width / img.height;
+		img.width = 500;
+		img.height = 500 / scale;
+	}
+}
+//-->
+</SCRIPT>
+
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<TABLE cellSpacing=0 cellPadding=0 width=755 align=center border=0>
+  <TBODY>
+  <TR>
+    <TD width=258 bgColor=#efebef height=25>
+      <P align=left><A href="http://bbs.programfan.com/" target=_top><IMG 
+      src="数据结构--栈的应用.files/bbs.gif" border=0></A></P></TD>
+    <TD width=497 bgColor=#efebef height=25>
+      <P align=right><A style="COLOR: #de0400" href="http://www.programfan.com/" 
+      target=_blank>首页</A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://job.pfan.cn/" target=_blank><STRONG>人才招聘</STRONG></A>&nbsp;<A 
+      style="COLOR: #de0400" href="http://www.programfan.com/project/" 
+      target=_blank><STRONG>项目交易</STRONG></A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://blog.programfan.com/" 
+      target=_blank><STRONG>BLOG</STRONG></A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://www.programfan.com/team" 
+      target=_blank><STRONG>兴趣小组</STRONG></A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://www.programfan.com/book" target=_blank>图书</A>&nbsp;<A 
+      style="COLOR: #de0400" href="http://www.programfan.com/news" 
+      target=_blank>资讯</A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://www.programfan.com/article" target=_blank>文章</A>&nbsp;<A 
+      style="COLOR: #de0400" href="http://www.programfan.com/download.asp" 
+      target=_blank>下载</A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://www.programfan.com/code" target=_blank>源码</A>&nbsp;<A 
+      style="COLOR: #de0400" href="http://www.programfan.com/wysoft" 
+      target=_blank>网友作品</A>&nbsp;<A style="COLOR: #de0400" 
+      href="http://www.programfan.com/bookcd.asp" 
+      target=_blank>刻盘服务</A>&nbsp;</P></TD></TR></TBODY></TABLE>
+<TABLE width=755 align=center border=0>
+  <TBODY>
+  <TR>
+    <TD bgColor=#efebef><A href="http://www.uipower.com/" target=_blank><IMG 
+      src="数据结构--栈的应用.files/skin76080.jpg" border=0></A></TD></TR></TBODY></TABLE>
+<DIV align=center>
+<TABLE cellSpacing=0 cellPadding=0 width=755 border=0>
+  <FORM action=login.asp method=post><INPUT type=hidden 
+  value=http://www.programfan.com/club/showbbs.asp?id=215954 name=fromurl> 
+  <TBODY>
+  <TR>
+    <TD bgColor=#e8f0f8>
+      <P><FONT color=#ff0000><STRONG>请登陆或者注册新用户</STRONG></FONT> &nbsp; 用户名 
+      <INPUT class=input_style size=10 name=username> &nbsp;&nbsp; 密&nbsp; 码 
+      <INPUT class=input_style type=password size=10 name=password>&nbsp; <INPUT 
+      type=checkbox value=1 name=savename><FONT color=#ff0000>记住密码</FONT><INPUT class=button_style type=submit value=登陆 name=Submit>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/user/register.asp" 
+      target=_blank>注册新用户</A>&nbsp; <A 
+      href="http://www.programfan.com/user/forgetpass.asp" 
+      target=_blank>忘记密码了</A></P></TD></TR></FORM></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE cellSpacing=1 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD width=750 height=20><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+      border=0>&nbsp;您所在位置：<B><A 
+      href="http://www.programfan.com/club/main.asp">编程爱好者论坛</A> — <A 
+      href="http://www.programfan.com/club/bbs.asp?bbsid=40">数据结构与算法</A> — 
+      数据结构--栈的应用</B><BR><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+      border=0>&nbsp;本帖地址：&nbsp;<A 
+      href="http://www.programfan.com/club/post-215954.html">http://www.programfan.com/club/post-215954.html</A>&nbsp;[<A 
+      href="javascript:window.clipboardData.setData('text','http://www.programfan.com/club/post-215954.html');alert('复制成功');">复制地址</A>] 
+      [<A 
+      href="http://www.baidu.com/baidu?tn=yaozheng_pg&amp;word=%CA%FD%BE%DD%BD%E1%B9%B9%2D%2D%D5%BB%B5%C4%D3%A6%D3%C3" 
+      target=_blank>搜索相关帖子</A>]</TD></TR>
+  <TR>
+    <TD height=20>
+      <DIV align=center><!--<iframe id=nadframe marginwidth=0 marginheight=0 frameborder=0 scrolling=no src='http://ad.jobmet.com/5_487_jobs.html' width=760 height=60></iframe>//-->
+      <SCRIPT type=text/javascript><!--
+google_ad_client = "pub-6319745239117838";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</SCRIPT>
+
+      <SCRIPT src="数据结构--栈的应用.files/show_ads.js" type=text/javascript>
+</SCRIPT>
+      </DIV></TD></TR>
+  <TR>
+    <TD height=20>
+      <TABLE cellSpacing=0 width=755 border=0>
+        <TBODY>
+        <TR>
+          <TD width=334>
+            <TABLE cellSpacing=5 cellPadding=0 width="98%" border=0>
+              <TBODY>
+              <TR>
+                <TD 
+                style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+                width="33%"><STRONG>&nbsp;<B><IMG 
+                  src="数据结构--栈的应用.files/arrow1.gif" border=0></B>&nbsp;<A 
+                  style="COLOR: #333333" 
+                  href="http://www.programfan.com/club/addbbs.asp?bbsid=40" 
+                  target=_blank>发&nbsp;新&nbsp;帖</A></STRONG></TD>
+                <TD 
+                style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+                width="33%"><STRONG>&nbsp;<B><IMG 
+                  src="数据结构--栈的应用.files/arrow1.gif" border=0></B>&nbsp;<A 
+                  style="COLOR: #333333" 
+                  href="http://www.programfan.com/club/reply.asp?id=215954">回&nbsp;帖</A></STRONG></TD>
+                <TD 
+                style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+                width="34%"><STRONG>&nbsp;<B><IMG 
+                  src="数据结构--栈的应用.files/arrow1.gif" border=0></B>&nbsp;<A 
+                  style="COLOR: #333333" 
+                  href="http://www.programfan.com/club/post-215954.html#reply">快速回帖</A></STRONG></TD></TR></TBODY></TABLE></TD>
+          <TD align=right width=417><IFRAME id=qihooframe border=0 
+            marginWidth=0 frameSpacing=0 marginHeight=0 
+            src="数据结构--栈的应用.files/CAMVCTUB.htm" frameBorder=0 width=300 
+            scrolling=no 
+height=30></IFRAME></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></DIV>
+<TABLE class=table_border cellSpacing=1 cellPadding=0 width=755 align=center 
+border=0>
+  <TBODY>
+  <TR class=tb_topic>
+    <TD>
+      <TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="64%"><B><FONT 
+          color=#ff0000>&nbsp;主题：</FONT>数据结构--栈的应用</B></TD>
+          <TD width="36%">
+            <DIV align=right><!--<img src="image/email1.gif" width="17" height="15"><a href="javascript:subwin('sendmail.asp?id=215954','report',500,250)" class="a1">推荐</a>//-->&nbsp;<IMG 
+            height=16 src="数据结构--栈的应用.files/care.gif" width=16><A class=a1 
+            href="http://www.programfan.com/club/mywebedit.asp?title=%CA%FD%BE%DD%BD%E1%B9%B9%2D%2D%D5%BB%B5%C4%D3%A6%D3%C3&amp;url=http%3A%2F%2Fwww%2Eprogramfan%2Ecom%2Fclub%2Fshowbbs%2Easp%3Fid%3D215954&amp;tag=%C2%DB%CC%B3">&nbsp;收藏</A>&nbsp;<A 
+            class=a1 title=打印本页面 
+            href="http://www.programfan.com/club/showtxt.asp?id=215954&amp;action=print"><IMG 
+            src="数据结构--栈的应用.files/print.gif" border=0>&nbsp;打印</A>&nbsp;<A 
+            class=a1 title=将本页面保存至硬盘 href="javascript:SaveAs(215954);"><IMG 
+            src="数据结构--栈的应用.files/save.gif" 
+            border=0>&nbsp;保存</A>&nbsp;<STRONG><IMG height=15 
+            src="数据结构--栈的应用.files/arraw2.gif" width=15></STRONG><A class=a1 
+            href="javascript:subwin('report.asp?id=215954','report',500,250)">&nbsp;举报</A>&nbsp;<IMG 
+            height=12 src="数据结构--栈的应用.files/openwindow.gif" width=10><A class=a1 
+            title=以文本方式阅读本帖 
+            href="http://www.programfan.com/club/showtxt.asp?id=215954">&nbsp;文本</A>&nbsp;</DIV></TD></TR></TBODY></TABLE></TD></TR>
+  <TR>
+    <TD>
+      <TABLE cellSpacing=0 cellPadding=0 width=750 border=0>
+        <TBODY>
+        <TR vAlign=top>
+          <TD class=tb_bgcolor1 align=middle width=164>作者：<A 
+            href="http://www.programfan.com/club/member.asp?userid=192396" 
+            target=_blank>15763068</A><BR><FONT 
+            color=#ff0000>专家分：90</FONT><BR><IMG src="数据结构--栈的应用.files/20.gif"> 
+            <TABLE cellPadding=0 width="60%" align=center border=0>
+              <TBODY>
+              <TR>
+                <TD width="100%"><IMG height=16 
+                  src="数据结构--栈的应用.files/search.gif" width=16>&nbsp;<A 
+                  href="http://www.programfan.com/club/member.asp?userid=192396" 
+                  target=_blank>会员信息</A><BR><IMG 
+                  src="数据结构--栈的应用.files/message.gif" border=0>&nbsp;<A 
+                  href="javascript:subwin('sendmessage.asp?touser=15763068','sendmessage',500,400)">发短消息</A><BR><IMG 
+                  height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+                  style="COLOR: red" 
+                  href="http://blog.programfan.com/redirect.asp?user=15763068" 
+                  target=_blank>所属BLOG</A></TD></TR></TBODY></TABLE></TD>
+          <TD width=590>
+            <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-1-24 
+            22:09:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+            href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp; 
+            <BR><!--<a href=http://www.KaileSoft.cn target=_blank style="color:#ff0000">高质高效舒适地开发:使用Visual Unit</a>&nbsp;&nbsp;<a href=http://www.rzhh.com.cn/ target=_blank style="color:#ff0000">北京睿智汇海ASP.NET培训专家，2个月实现高薪梦想</a>//--></DIV>
+            <DIV class=td_content 
+            style="FONT-WEIGHT: bold; TEXT-ALIGN: right">楼主</DIV>
+            <DIV class=td_content>
+            <TABLE cellSpacing=5 cellPadding=0 width="100%" border=0>
+              <TBODY>
+              <TR>
+                <TD vAlign=top width="82%"><B><FONT size=4><FONT 
+                  color=#ff00ff>我的blog，<A href="http://www.9ite.cn/" 
+                  target=_blank>http://www.9ite.cn/</A>欢迎大家来踩</FONT></FONT></B><BR><BR>/*这一次写到栈了，继续加油....不知道还有没有什么地方可以改进<BR>听别人说用主函数用void&nbsp;main()还是int&nbsp;main()好一些？有什么区别*/<BR><BR><BR>#include&nbsp;"stdio.h"<BR>#include&nbsp;"malloc.h"<BR>#include&nbsp;"stdlib.h"<BR>#include&nbsp;"conio.h"<BR>#define&nbsp;MAX&nbsp;50<BR>typedef&nbsp;struct&nbsp;node<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;data;<BR>&nbsp;&nbsp;&nbsp;&nbsp;struct&nbsp;node&nbsp;*next;<BR>}Stacknode,*Linkstack;<BR>Linkstack&nbsp;Init_Linkstack()<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;NULL;<BR>}<BR>Linkstack&nbsp;Push_Linkstack(Linkstack&nbsp;top,int&nbsp;x)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;Stacknode&nbsp;*s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s=new&nbsp;Stacknode;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;data=x;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;next=top;<BR>&nbsp;&nbsp;&nbsp;&nbsp;top=s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;top;<BR>}<BR>Linkstack&nbsp;Pop_Linkstack(Linkstack&nbsp;top,int&nbsp;*x)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;Stacknode&nbsp;*s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;if(top==NULL)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;NULL;<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*x=top-&gt;data;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s=top;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top=top-&gt;next;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;free(s);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;top;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR>void&nbsp;Print_Linkstack(Linkstack&nbsp;top)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;Stacknode&nbsp;*s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s=top;<BR>&nbsp;&nbsp;&nbsp;&nbsp;while(s-&gt;next!=NULL)<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%d-&gt;",s-&gt;data);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s=s-&gt;next;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;printf("%d",s-&gt;data);<BR>}<BR><BR>typedef&nbsp;struct<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;data[MAX];<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;top;<BR>}Seqstack;<BR>Seqstack&nbsp;*Init_Seqstack()<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;Seqstack&nbsp;*s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s=new&nbsp;Seqstack;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;top=-1;<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;s;<BR>}<BR>int&nbsp;Empty_Seqstack(Seqstack&nbsp;*s)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;if(s-&gt;top==-1)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;1;<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;<BR>}<BR>int&nbsp;Push_Seqstack(Seqstack&nbsp;*s,int&nbsp;x)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;if(s-&gt;top==MAX-1)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;top++;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;data[s-&gt;top]=x;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;1;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR>int&nbsp;Pop_Seqstack(Seqstack&nbsp;*s,int&nbsp;*x)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;if(Empty_Seqstack(s))<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*x=s-&gt;data[s-&gt;top];<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s-&gt;top--;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;1;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR>void&nbsp;coversion(int&nbsp;N,int&nbsp;r)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;x;<BR>&nbsp;&nbsp;&nbsp;&nbsp;Seqstack&nbsp;*s;<BR>&nbsp;&nbsp;&nbsp;&nbsp;s=Init_Seqstack();<BR>&nbsp;&nbsp;&nbsp;&nbsp;printf("\n十进制%d转换为%d进制为:",N,r);<BR>&nbsp;&nbsp;&nbsp;&nbsp;while(N)<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Push_Seqstack(s,N%r);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N=N/r;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;while(!Empty_Seqstack(s))<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pop_Seqstack(s,&amp;x);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%d",x);<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR>void&nbsp;main()<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;Linkstack&nbsp;top;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;N,r;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;k,x;<BR>&nbsp;&nbsp;&nbsp;&nbsp;top=Init_Linkstack();<BR>&nbsp;&nbsp;&nbsp;&nbsp;do{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n\n\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;栈应用子系统&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t*************************\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1--链式进栈&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2--链式出栈&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3--链栈显示&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4--进制转换&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0--返&nbsp;&nbsp;&nbsp;&nbsp;回&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t*************************\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\t\t\t&nbsp;&nbsp;&nbsp;请选择菜单(0-3):");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scanf("%d",&amp;k);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch(k)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;1:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n请输入进栈的元素x:");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scanf("%d",&amp;x);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top=Push_Linkstack(top,x);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n元素已进栈!按任意键返回..");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getch();<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("cls");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;2:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top=Pop_Linkstack(top,&amp;x);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n头元素已出栈!按任意键返回..");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getch();<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("cls");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;3:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n链栈元素为:");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print_Linkstack(top);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n按任意键返回..");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getch();<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("cls");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case&nbsp;4:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n请输入十进制N和要转换的进制r(N,r):");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scanf("%d,%d",&amp;N,&amp;r);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;coversion(N,r);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n按任意键返回..");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getch();<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("cls");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;}while(k!=0);<BR>}<BR><BR><BR><BR><BR><BR><BR>
+                  <P align=right>&nbsp;<SPAN 
+                  style="COLOR: #999999">&nbsp;最后修改于2007-8-26 17:33:00</SPAN> 
+                  <P>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+                  border=0><BR><FONT color=#ff00ff>⿻疲倦，卻無法沉睡</FONT>ポ|<FONT 
+                  color=#0000ff>我的网站</FONT>:<A href="http://www.9ite.cn/" 
+                  target=_blank>http://www.9ite.cn/</A><BR><B><FONT 
+                  color=#008000>存在，是生命的前提，因为存在，我们有了生命，因为生命，我们有了爱情和友谊，因为爱情和友谊，我们的生命有了永恒的意义</FONT>！</B></TD>
+                <TD vAlign=top width="18%">
+                  <TABLE height=68 cellSpacing=0 cellPadding=0 width=61 
+                  background=数据结构--栈的应用.files/upbg.jpg border=0>
+                    <TBODY>
+                    <TR>
+                      <TD align=middle width=60 height=40>
+                        <DIV id=upnum>1 </DIV></TD></TR>
+                    <TR>
+                      <TD align=middle height=28>
+                        <DIV id=uptext><A 
+                        href="javascript:alert('请登陆后推荐');">我要推荐</A> 
+                    </DIV></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></DIV></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=671068>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=185964" 
+      target=_blank>雪光风剑</A><BR><FONT color=#ff0000>专家分：17030</FONT><BR><IMG 
+      src="数据结构--栈的应用.files/114.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=%D1%A9%B9%E2%B7%E7%BD%A3" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=雪光风剑','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=雪光风剑" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590 bgColor=#f6f6f6>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-1-24 
+      22:36:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=671068">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>1 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV 
+      class=td_content>是这样的<BR>int&nbsp;main()是ansi&nbsp;c的标准格式<BR>c从来就没有void&nbsp;main()这样的标准<BR>这是vc带来的杜撰出来的不良编程习惯<BR>一个良好的程序应该向操作系统汇报程序已经执行完毕并且有义务返回程序是否顺利地执行完毕
+      <P align=right>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+      border=0><BR>请大家自觉采用c99标准中的int&nbsp;main<BR>main函数的默认返回值是0<BR>void&nbsp;main是国产教材的典型误区</DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"><FONT 
+      color=#ff00ff>&nbsp;<B>此帖被评30分</B></FONT><B> 
+</DIV></B></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=672262>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=191880" 
+      target=_blank>vcacm</A><BR><FONT color=#ff0000>专家分：1450</FONT><BR><IMG 
+      height=100 src="" width=80> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=vcacm" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=vcacm','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=vcacm" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-1-27 
+      18:37:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=672262">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>2 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV class=td_content>
+      <BLOCKQUOTE><STRONG>引用</STRONG>：
+        <DIV 
+        class=quote>是这样的<BR>int&nbsp;main()是ansi&nbsp;c的标准格式<BR>c从来就没有void&nbsp;main()这样的标准<BR>这是vc带来的杜撰出来的不良编程习惯<BR>一个良好的程序应该向操作系统汇报程序已经执行完毕并且有义务返回程序是否顺利地执行完毕</DIV></BLOCKQUOTE><BR>我也是这样认为的,我在GCC环境中调试时,main必须注为:<BR>int&nbsp;main()<BR>{<BR>&nbsp;return&nbsp;0;<BR>}<BR>
+      <P align=right>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+      border=0><BR><A 
+      href="http://www.freesurvey.net.cn/?SOURCE-AB70DA0D-4607-43F7-81F4-D762450E455E&nbsp;" 
+      target=_blank>http://www.freesurvey.net.cn/?SOURCE-AB70DA0D-4607-43F7-81F4-D762450E455E&nbsp;</A>;<BR>To&nbsp;do&nbsp;a&nbsp;man&nbsp;,&nbsp;which&nbsp;you&nbsp;most&nbsp;want&nbsp;to&nbsp;be.</DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"></B><FONT 
+      color=#ff0000><B>&nbsp; </B>此帖尚未评分</FONT> </DIV></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=713366>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=48168" 
+      target=_blank>goal00001111</A><BR><FONT 
+      color=#ff0000>专家分：4030</FONT><BR><IMG src="数据结构--栈的应用.files/51.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=goal00001111" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=goal00001111','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=goal00001111" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590 bgColor=#f6f6f6>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-4-20 
+      15:05:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=713366">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>3 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV 
+      class=td_content>说到栈,我给一个相关的程序代码:<BR>列车调度问题?<BR>铁路进行列车调度时,&nbsp;常把站台设计成栈式结构的站台，试问：<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设有编号为1,2,3,4,5,6的六辆列车,&nbsp;顺序开入栈式结构的站台,&nbsp;则可能的出栈序列有多少种?<BR>要求:(1)请给出程序代码.(最好是c版的)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)如果能从概率方面分析,不用程序实现,请给出你的理论.<BR><BR>三种不同的解法：第一种是利用递推公式求解，第二种和第三种都是模拟出入栈的情景，采用回溯的方法求解，其中第二种只能求出组合的个数,&nbsp;第三种可以输出具体的出栈序列。<BR><BR>程序一：<BR>/*<BR>&nbsp;&nbsp;Name:&nbsp;<BR>&nbsp;&nbsp;Copyright:&nbsp;<BR>&nbsp;&nbsp;Author:&nbsp;<BR>&nbsp;&nbsp;Date:&nbsp;24-03-07&nbsp;23:57<BR>&nbsp;&nbsp;Description:&nbsp;公式:&nbsp;F(n)&nbsp;=&nbsp;F(0)*F(n-1)&nbsp;+&nbsp;F(1)*F(n-2)&nbsp;+&nbsp;F(2)*F(n-3)&nbsp;+&nbsp;...&nbsp;+&nbsp;F(n-1)*F(0);&nbsp;<BR>*/<BR>#include&nbsp;&lt;stdio.h&gt;&nbsp;<BR>#include&nbsp;&lt;stdlib.h&gt;&nbsp;<BR><BR>int&nbsp;Stack(int&nbsp;n);<BR><BR>int&nbsp;main(void)&nbsp;<BR>{&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;n;<BR>&nbsp;&nbsp;&nbsp;&nbsp;puts("请输入列车的数量：");<BR>&nbsp;&nbsp;&nbsp;&nbsp;scanf("%d",&nbsp;&amp;n);<BR>&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;printf("sum&nbsp;=&nbsp;%d\n",&nbsp;Stack(n));<BR>&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("pause");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;&nbsp;<BR>}<BR><BR>int&nbsp;Stack(int&nbsp;n)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(n&nbsp;==&nbsp;0&nbsp;||&nbsp;n&nbsp;==&nbsp;1)&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;1;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;i&nbsp;=&nbsp;0;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;sum&nbsp;=&nbsp;0;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while&nbsp;(i&nbsp;&lt;&nbsp;n)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sum&nbsp;+=&nbsp;Stack(i)&nbsp;*&nbsp;Stack(n-i-1);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i++;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;&nbsp;sum;<BR>}<BR><BR>程序二：<BR>/*<BR>&nbsp;&nbsp;Name:&nbsp;<BR>&nbsp;&nbsp;Copyright:&nbsp;<BR>&nbsp;&nbsp;Author:&nbsp;<BR>&nbsp;&nbsp;Date:&nbsp;24-03-07&nbsp;23:57<BR>&nbsp;&nbsp;Description:&nbsp;<BR>*/<BR>#include&nbsp;&lt;stdio.h&gt;&nbsp;<BR>#include&nbsp;&lt;stdlib.h&gt;&nbsp;<BR>#define&nbsp;MAX&nbsp;6<BR><BR>int&nbsp;count&nbsp;=&nbsp;0;<BR><BR>void&nbsp;Stack(int&nbsp;t,&nbsp;int&nbsp;n);<BR><BR>int&nbsp;main(void)&nbsp;<BR>{&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;t&nbsp;=&nbsp;0;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;Stack(t,&nbsp;1);&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;printf("sum&nbsp;=&nbsp;%d\n",&nbsp;count);<BR>&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("pause");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;&nbsp;<BR>}<BR><BR>void&nbsp;Stack(int&nbsp;t,&nbsp;int&nbsp;n)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;i,&nbsp;j;<BR>&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(n&nbsp;==&nbsp;MAX)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++count;//累积各种可能的出序&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++t;//入栈&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(i=0;&nbsp;i&lt;=t;&nbsp;i++)//回溯&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stack(t-i,&nbsp;n+1);//出栈i个元素以后递归执行函数&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR><BR>程序三：<BR>/*<BR>&nbsp;&nbsp;Name:&nbsp;<BR>&nbsp;&nbsp;Copyright:&nbsp;<BR>&nbsp;&nbsp;Author:&nbsp;<BR>&nbsp;&nbsp;Date:&nbsp;24-03-07&nbsp;23:57<BR>&nbsp;&nbsp;Description:&nbsp;<BR>*/<BR>#include&nbsp;&lt;stdio.h&gt;&nbsp;<BR>#include&nbsp;&lt;stdlib.h&gt;&nbsp;<BR>#define&nbsp;MAX&nbsp;6<BR><BR>int&nbsp;count&nbsp;=&nbsp;0;<BR><BR>void&nbsp;Stack(int&nbsp;s[],&nbsp;int&nbsp;cs[],&nbsp;int&nbsp;t,&nbsp;int&nbsp;ct,&nbsp;int&nbsp;n);<BR><BR>int&nbsp;main(void)&nbsp;<BR>{&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;s[MAX]&nbsp;=&nbsp;{0};//用来存储当前站内的列车序号&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;cs[MAX]&nbsp;=&nbsp;{0};//用来存储已出站的列车序号&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;t&nbsp;=&nbsp;0;//s栈的栈顶指针&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;ct&nbsp;=&nbsp;0;//cs栈的栈顶指针&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;n&nbsp;=&nbsp;1;//入站的列车序号&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;Stack(s,&nbsp;cs,&nbsp;t,&nbsp;ct,&nbsp;n);&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;printf("\nsum&nbsp;=&nbsp;%d\n",&nbsp;count);<BR>&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;system("pause");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;0;&nbsp;<BR>}<BR><BR>void&nbsp;Stack(int&nbsp;s[],&nbsp;int&nbsp;cs[],&nbsp;int&nbsp;t,&nbsp;int&nbsp;ct,&nbsp;int&nbsp;n)<BR>{<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;i,&nbsp;j;<BR>&nbsp;&nbsp;&nbsp;&nbsp;int&nbsp;a[MAX];<BR>&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(n&nbsp;==&nbsp;MAX)//如果所有的列车都已入站，输出其出站序列&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(i=0;&nbsp;i&lt;ct;&nbsp;++i)//先输出已经出站的序列&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%d&nbsp;&nbsp;",cs[i]);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%d&nbsp;&nbsp;",&nbsp;n);//输出最后入站的列车，序号为n&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(i=t-1;&nbsp;i&gt;=0;&nbsp;--i)//输出仍在站内的列车序列&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("%d&nbsp;&nbsp;",&nbsp;s[i]);<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf("\n");<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;++count;//累积各种可能的出序&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;else<BR>&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s[t++]&nbsp;=&nbsp;n;//入栈&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(i=0;&nbsp;i&lt;=t;&nbsp;++i)//把当前站内的列车序列复制到临时数组&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a[i]&nbsp;=&nbsp;s[i];<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(i=0;&nbsp;i&lt;=t;&nbsp;++i)//回溯&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(j=0;&nbsp;j&lt;i;&nbsp;++j)//记录出站的列车序列&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cs[ct+j]&nbsp;=&nbsp;a[t-j-1];<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stack(s,&nbsp;cs,&nbsp;t-i,&nbsp;ct+j,&nbsp;n+1);//出栈i个元素以后递归执行函数&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>&nbsp;&nbsp;&nbsp;&nbsp;}<BR>}<BR><BR>
+      <P align=right>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+      border=0><BR>爱一个人,爱一段代码...</DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"></B><FONT 
+      color=#ff0000><B>&nbsp; </B>此帖尚未评分</FONT> </DIV></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=714341>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=103786" 
+      target=_blank>lt19870917</A><BR><FONT color=#ff0000>专家分：750</FONT><BR><IMG 
+      src="数据结构--栈的应用.files/50.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=lt19870917" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=lt19870917','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=lt19870917" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-4-21 
+      22:42:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=714341">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>4 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV 
+      class=td_content>int&nbsp;main(){<BR><BR><BR><BR>return&nbsp;EXIT_SUCCESS;<BR>}
+      <P align=right>&nbsp;</P></DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"><FONT 
+      color=#ff00ff>&nbsp;<B>此帖被评30分</B></FONT><B> 
+</DIV></B></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=778480>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=192396" 
+      target=_blank>15763068</A><BR><FONT color=#ff0000>专家分：90</FONT><BR><IMG 
+      src="数据结构--栈的应用.files/20.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=15763068" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=15763068','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=15763068" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590 bgColor=#f6f6f6>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-8-26 
+      17:25:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=778480">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>5 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV class=td_content>恩，挺不错的
+      <P align=right>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+      border=0><BR><FONT color=#ff00ff>⿻疲倦，卻無法沉睡</FONT>ポ|<FONT 
+      color=#0000ff>我的网站</FONT>:<A href="http://www.9ite.cn/" 
+      target=_blank>http://www.9ite.cn/</A><BR><B><FONT 
+      color=#008000>存在，是生命的前提，因为存在，我们有了生命，因为生命，我们有了爱情和友谊，因为爱情和友谊，我们的生命有了永恒的意义</FONT>！</B></DIV></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=793511>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=229181" 
+      target=_blank>8825155600</A><BR><FONT color=#ff0000>专家分：0</FONT><BR><IMG 
+      src="数据结构--栈的应用.files/0.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=8825155600" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=8825155600','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=8825155600" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-10-7 
+      14:54:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=793511">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000>6 
+      </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV class=td_content>请问system("pause");什么意思,谢谢<BR><BR><BR>
+      <P align=right>&nbsp;</P></DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"></B><FONT 
+      color=#ff0000><B>&nbsp; </B>此帖尚未评分</FONT> </DIV></TD></TR></TBODY></TABLE></DIV>
+<DIV align=center>
+<TABLE class=table_border cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor1 vAlign=top align=middle width=164><A 
+      name=793639>作者：</A><A 
+      href="http://www.programfan.com/club/member.asp?userid=227213" 
+      target=_blank>foka</A><BR><FONT color=#ff0000>专家分：130</FONT><BR><IMG 
+      src="数据结构--栈的应用.files/9.gif"> 
+      <DIV align=center>
+      <TABLE cellPadding=0 width="60%" border=0>
+        <TBODY>
+        <TR>
+          <TD width="100%"><IMG height=16 src="数据结构--栈的应用.files/search.gif" 
+            width=16>&nbsp;<A 
+            href="http://www.programfan.com/club/member.asp?name=foka" 
+            target=_blank>会员信息</A><BR><IMG src="数据结构--栈的应用.files/message.gif" 
+            border=0>&nbsp;<A 
+            href="javascript:subwin('sendmessage.asp?touser=foka','sendmessage',500,400)">发短消息</A>&nbsp;&nbsp;<BR><IMG 
+            height=16 src="数据结构--栈的应用.files/website.gif" width=16>&nbsp;<A 
+            style="COLOR: red" 
+            href="http://blog.programfan.com/redirect.asp?user=foka" 
+            target=_blank>所属BLOG</A> </TD></TR></TBODY></TABLE></DIV></TD>
+    <TD vAlign=top width=590 bgColor=#f6f6f6>
+      <DIV class=td_content><SPAN style="COLOR: #999999">发表时间：2007-10-7 
+      21:35:00&nbsp;&nbsp;&nbsp;</SPAN> <A 
+      href="http://www.programfan.com/club/reply.asp?id=215954">[回复]</A>&nbsp;&nbsp;<A 
+      href="http://www.programfan.com/club/reply.asp?id=215954&amp;quote=1&amp;replyid=793639">[引用]</A> 
+      </DIV>
+      <DIV class=td_content 
+      style="FONT-WEIGHT: bold; TEXT-ALIGN: right"><B><FONT color=#ff0000><A 
+      name=last>7</A> </FONT>楼&nbsp;&nbsp;</B></DIV>
+      <DIV class=td_content><BR>如上，也想知道答案！
+      <P align=right>&nbsp;</P><IMG alt=签名档 src="数据结构--栈的应用.files/qianming.gif" 
+      border=0><BR>QQ;553226117,大家一起加油!</DIV>
+      <DIV class=td_content 
+      style="BORDER-RIGHT: #aaaaaa 1px dashed; BORDER-TOP: #aaaaaa 1px dashed; MARGIN: 15px 80px 30px; BORDER-LEFT: #aaaaaa 1px dashed; BORDER-BOTTOM: #aaaaaa 1px dashed; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: left"></B><FONT 
+      color=#ff0000><B>&nbsp; </B>此帖尚未评分</FONT> </DIV></TD></TR></TBODY></TABLE></DIV>
+<TABLE class=table_border cellSpacing=1 width=755 align=center border=0>
+  <FORM name=f1 method=post>
+  <TBODY>
+  <TR>
+    <TD class=tb_bgcolor style="FONT-WEIGHT: bold; TEXT-ALIGN: center">[首页] 
+      [上页][下页] [尾页] &nbsp;&nbsp;&nbsp;&nbsp;共有 7 回帖 当前第 1 
+      页（共1页&nbsp;10帖/页）&nbsp;&nbsp;&nbsp;&nbsp; 跳转至第 <SELECT class=input_style 
+      onchange=jump(document.f1.page.value); name=page> <OPTION value=1 
+        selected>1</OPTION></SELECT> 页</TD></TR></FORM></TR>
+  <TR>
+    <TD>
+      <TABLE cellSpacing=5 cellPadding=0 width=450 border=0>
+        <TBODY>
+        <TR>
+          <TD 
+          style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+          width=117><STRONG>&nbsp;<B><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+            border=0></B>&nbsp;<A style="COLOR: #333333" 
+            href="http://www.programfan.com/club/addbbs.asp?bbsid=40" 
+            target=_blank>发&nbsp;新&nbsp;帖</A></STRONG></TD>
+          <TD 
+          style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+          width=117><STRONG>&nbsp;<B><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+            border=0></B>&nbsp;<A style="COLOR: #333333" 
+            href="http://www.programfan.com/club/reply.asp?id=215954">回&nbsp;帖</A></STRONG></TD>
+          <TD 
+          style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+          width=121><STRONG>&nbsp;<B><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+            border=0></B>&nbsp;<A style="COLOR: #333333" 
+            href="http://www.programfan.com/club/post-215954.html#reply">快速回帖</A></STRONG></TD>
+          <TD 
+          style="BORDER-RIGHT: #6b8cc6 1px solid; BORDER-TOP: #6b8cc6 1px solid; BORDER-LEFT: #6b8cc6 1px solid; BORDER-BOTTOM: #6b8cc6 1px solid; BACKGROUND-COLOR: #eeeeee" 
+          width=121><STRONG>&nbsp;<B><IMG src="数据结构--栈的应用.files/arrow1.gif" 
+            border=0></B>&nbsp;<A style="COLOR: #333333" 
+            href="javascript:location.reload()">刷新版面</A></STRONG></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<DIV align=center>
+<TABLE 
+style="BORDER-RIGHT: #aaaaaa 1px solid; BORDER-TOP: #aaaaaa 1px solid; MARGIN-TOP: 5px; BORDER-LEFT: #aaaaaa 1px solid; BORDER-BOTTOM: #aaaaaa 1px solid" 
+cellSpacing=0 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD width=755>
+      <P align=center><B>版主管理：&nbsp; <A 
+      onclick="{if(confirm('您确认删除此帖吗？')){return true;}return false;}" 
+      href="javascript:bbsmanage('del1');">删除此帖</A>&nbsp;&nbsp;&nbsp;<A 
+      onclick="{if(confirm('您确认删除所有回复帖吗？')){return true;}return false;}" 
+      href="javascript:bbsmanage('delreply');">删除回复帖</A>&nbsp;&nbsp;&nbsp;<A 
+      onclick="javascript:subwin('','move',430,250);" 
+      href="javascript:movebbs();">转贴</A>&nbsp;&nbsp;&nbsp;<A 
+      href="javascript:bbsmanage('head');">置顶</A>&nbsp;&nbsp;&nbsp;<A 
+      href="javascript:bbsmanage('best');">取消精华</A>&nbsp;&nbsp;&nbsp;<A 
+      onclick="{if(confirm('您确认强制结帖吗？')){return true;}return false;}" 
+      href="javascript:bbsmanage('over');">强制结帖</A><A 
+      href="javascript:bbsmanage('best');"></A>&nbsp;&nbsp;&nbsp;<A 
+      style="COLOR: #ff0000" 
+      href="http://www.programfan.com/club/mbbs.asp?bbsid=40">&gt;&gt;&gt;进入管理页面</A></B></P></TD></TR></TBODY></TABLE></DIV>
+<SCRIPT type=text/javascript>
+<!--
+function bbsmanage(action)
+{
+	document.bbsmanage.action.value = action;
+	document.bbsmanage.submit();
+}
+//-->
+</SCRIPT>
+
+<FORM name=bbsmanage action=bbsmanage.asp method=post><INPUT type=hidden 
+name=action> <INPUT type=hidden value=215954 name=id> <INPUT type=hidden 
+value=40 name=bbsid> </FORM>
+<FORM name=movebbs action=movebbs.asp method=post target=move><INPUT type=hidden 
+value=215954 name=id> <INPUT type=hidden value=40 name=bbsid> </FORM>
+<TABLE width=755 align=center border=0>
+  <TBODY>
+  <TR>
+    <TD align=middle><!--
+	<iframe src="/ad/adv.asp" marginheight="0" marginwidth="0" width="755" height="100" frameborder="0" scrolling="no"></iframe>//-->
+      <SCRIPT type=text/javascript> 
+var arrBaiduCproConfig=new Array(); 
+arrBaiduCproConfig['uid'] =326815;
+arrBaiduCproConfig['n'] ='yaozheng_cpr';
+arrBaiduCproConfig['tm'] =20;
+arrBaiduCproConfig['cm'] =76;
+arrBaiduCproConfig['um'] =26;
+arrBaiduCproConfig['w'] =755;
+arrBaiduCproConfig['h'] =90;
+arrBaiduCproConfig['wn'] =4;
+arrBaiduCproConfig['hn'] =1;
+arrBaiduCproConfig['ta'] ='right';
+arrBaiduCproConfig['tl'] ='bottom';
+arrBaiduCproConfig['bu'] =0;
+arrBaiduCproConfig['bd'] ='#DD6400';
+arrBaiduCproConfig['bg'] ='#FEF0E2';
+arrBaiduCproConfig['tt'] ='#0000ff';
+arrBaiduCproConfig['ct'] ='#333333';
+arrBaiduCproConfig['url'] ='#666666';
+arrBaiduCproConfig['bdl'] ='#ffffff';
+arrBaiduCproConfig['rad'] =1;
+</SCRIPT>
+
+      <SCRIPT src="数据结构--栈的应用.files/ui.js" type=text/javascript> 
+</SCRIPT>
+
+      <SCRIPT type=text/javascript> 
+<!-- 
+document.write(baiduCproIFrame()); 
+--> 
+</SCRIPT>
+    </TD></TR></TBODY></TABLE><A name=reply></A>
+<FORM name=bbsaction action=bbsaction.asp method=post><INPUT type=hidden 
+value=215954 name=id> <INPUT type=hidden name=action> </FORM>
+<DIV align=center>
+<TABLE cellSpacing=1 cellPadding=0 width=755 border=0>
+  <TBODY>
+  <TR>
+    <TD align=middle width="100%"><BR><A 
+      href="http://www.programfan.com/aboutus.asp">关于本站</A> - <A 
+      href="http://www.programfan.com/daohang.asp">网站导航</A> - <A 
+      href="http://www.programfan.com/ad.asp">广告服务</A> - <A 
+      href="http://www.programfan.com/contact.asp?subject=关于网站">联系站长</A> - <A 
+      href="http://www.programfan.com/contact.asp?subject=bug">BUG报告</A> - <A 
+      href="http://www.programfan.com/friendlink.asp">友情链接</A> - <A 
+      href="http://www.programfan.com/sponsor.asp">赞助本站</A><BR>Copyright&copy; 
+      1999-2007 Programfan.com. All Rights Reserved<BR>论坛制作&amp;维护：Hannibal 
+      &nbsp;&nbsp;&nbsp;Email: <A 
+      href="mailto:webmaster@pfan.cn">webmaster@pfan.cn</A><BR>最佳浏览效果：IE6.0+&nbsp;或 
+      FireFox 1.5+ 分辨率：1024*768 </TD></TR></TBODY></TABLE></DIV>
+<SCRIPT src="数据结构--栈的应用.files/urchin.js" type=text/javascript>
+</SCRIPT>
+
+<SCRIPT type=text/javascript>
+_uacct = "UA-1952745-1";
+urchinTracker();
+</SCRIPT>
+</BODY></HTML>

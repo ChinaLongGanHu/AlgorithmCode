@@ -1,0 +1,382 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-6.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记5.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-5.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-7.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_5></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_5">第五章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_5">栈</A></H1>
+<P></P><A name=node_sec_5.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.1">5.1&nbsp;&nbsp;基本概念</A></H2>
+<P>栈（stack）是限制插入和删除只能在一个位置上进行的表，该位置是表的末端，叫做栈的顶（top），它是后进先出（LIFO）的。对栈的基本操作只有push（进栈）和pop（出栈）两种，前者相当于插入，后者相当于删除最后的元素。</P>
+<P>由于栈在本质上是一种受限制的表，所以可以使用任何一种表的形式来实现它，我们最常使用的一般有两种：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>链表 </P>
+  <LI>
+  <P>数组 </P></LI></OL>
+<P></P>
+<P>它们在复杂度上的优缺点对比如下：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>新增和删除元素时的时间复杂度 </P>
+  <UL>
+    <LI>
+    <P>链表：在动态申请内存（new或者malloc）上的花销非常昂贵。 </P>
+    <LI>
+    <P>数组：几乎没有花销，以常数O(1)时间运行，在带有自增和自减寻址功能的寄存器上操作时，编译器会把整数的push和pop操作编译成一条机器指令。 
+    </P></LI></UL>
+  <P></P>
+  <LI>
+  <P>空间复杂度 </P>
+  <UL>
+    <LI>
+    <P>链表：由于空间是动态申请、释放的，因此不会浪费空间，而且只要物理存储器允许，理论上能够满足最大范围未知的情况。 </P>
+    <LI>
+    <P>数组：必须在初始化时指定栈的大小，有可能会浪费空间，也有可能不够空间用。 </P></LI></UL>
+  <P></P></LI></OL>
+<P></P>
+<P>结论：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>如果对运行时的效率要求非常高，并且能够在初始化时预知栈的大小，那么应该首选数组形式；否则就应该选用链表形式。 </P>
+  <LI>
+  <P>由于对栈的操作永远都是针对栈顶（top）进行的，因此数组的随机存取的优点就没有了，而且数组必须预先分配空间，空间大小也受到限制，所以一般情况下（对运行时效率的要求不是太高）链表应该是首选。 
+  </P></LI></OL>
+<P></P>
+<P></P><A name=node_sec_5.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.2">5.2&nbsp;&nbsp;代码实现</A></H2>
+<P>栈的实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   stack.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-6 11:42:17</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__STACK_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__STACK_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../slist/src/slist.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CStack</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;
+{
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>push</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>pop</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>);
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>top</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*data</SPAN>) <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>push</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>AddTail</SPAN>(<SPAN class=variable>data</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>pop</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*data</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>IsEmpty</SPAN>())
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN>)
+        <SPAN class=variable>top</SPAN>(<SPAN class=variable>data</SPAN>);
+
+    <SPAN class=variable>RemoveTail</SPAN>();
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>top</SPAN>(<SPAN class=variable>T</SPAN> <SPAN class=variable>*data</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>data</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>IsEmpty</SPAN>())
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+
+    <SPAN class=variable>*data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetTail</SPAN>();
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __STACK_H__</SPAN></PRE>
+<P></P>
+<P>调用如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   stack.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-6 11:42:28</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"stack.h"</SPAN>
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>PrintValue</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>nValue</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>nRetCode</SPAN>)
+        <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>nValue</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"Error occured!"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>stack</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nValue</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>stack.push</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>stack.push</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>stack.push</SPAN>(<SPAN class=selfeval>3</SPAN>);
+
+    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.top</SPAN>(<SPAN class=variable>&amp;nValue</SPAN>);
+    <SPAN class=variable>PrintValue</SPAN>(<SPAN class=variable>nRetCode</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>nValue</SPAN>);
+
+    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.pop</SPAN>(<SPAN class=variable>&amp;nValue</SPAN>);
+    <SPAN class=variable>PrintValue</SPAN>(<SPAN class=variable>nRetCode</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>nValue</SPAN>);
+
+    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.pop</SPAN>(<SPAN class=variable>&amp;nValue</SPAN>);
+    <SPAN class=variable>PrintValue</SPAN>(<SPAN class=variable>nRetCode</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>nValue</SPAN>);
+
+    <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.pop</SPAN>(<SPAN class=variable>&amp;nValue</SPAN>);
+    <SPAN class=variable>PrintValue</SPAN>(<SPAN class=variable>nRetCode</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>nValue</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_5.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.3">5.3&nbsp;&nbsp;说明</A></H2>
+<P>上面的代码就是在单链表的基础上实现的栈，您会看到，在C++的继承机制下，栈的实现简单得可怕。 :)</P>
+<P>一个影响栈的运行效率的问题是错误检测。我的栈实现中是仔细地检查了错误的——对空栈进行top和pop操作，以及当存储空间不够时进行push操作是会引起异常的，显然，我们不愿意出现这种情况，但是，如果把对这些条件的检测放到代码中，那就很可能要花费像实际栈操作那样多的时间。由于这个原因，除非在错误处理极其重要的场合（例如在操作系统中），一般在栈中省去错误检测就成了普通的惯用手法。</P>
+<P>但我认为，一个良好的程序首先应该是健壮的，这比效率还要重要，特别是对于栈这种最基本的数据结构，它很可能会被作为基本的元素而被别的地方大量地使用。所以我并没有因为效率的问题而省去了错误检查机制。</P>
+<P>引入错误检查机制的代价是：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>对top和pop的操作变得有些繁琐。在代码中我是使用了返回值0或者1来表示成功或者失败，而实际的栈顶元素是通过参数来返回的。这样做必定会有人不满——太麻烦了！但这是我能想到的最好的解决方法，如果你有更好的方法，请告诉我。 
+  </P>
+  <LI>
+  <P>运行时效率会降低。如果确实耗费了太多的时间，你可以把错误检查去掉，但前提条件是你能确保整个运行过程中不会出错——其实还是要有错误检查的，只不过这些错误检查会放在外围来做而已。 
+  </P></LI></OL>
+<P></P>
+<P>好了，就说那么多，下面我们来看看栈的应用。</P>
+<P></P><A name=node_sec_5.4></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.4">5.4&nbsp;&nbsp;应用：中缀到后缀表达式的转换</A></H2>
+<P>对栈的应用实在是太广泛了（谁让栈是最基本的数据结构元素之一呢？），例如有平衡符号、表达式转换之类的，我们在这里就选择一个比较有实用价值的例子——中缀到后缀表达式的转换。（可以用在编译器等地方）</P>
+<P></P><A name=node_sec_5.4.1></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.4.1">5.4.1&nbsp;&nbsp;代码实现</A></H3>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   postfix.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-6 16:00:54</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=comment>// 算法：</SPAN>
+<SPAN class=comment>// 1)检查输入的下一元素。</SPAN>
+<SPAN class=comment>// 2)假如是个操作数，输出。</SPAN>
+<SPAN class=comment>// 3)假如是个开括号，将其压栈。</SPAN>
+<SPAN class=comment>// 4)假如是个运算符，则</SPAN>
+<SPAN class=comment>//   i) 假如栈为空，将此运算符压栈。</SPAN>
+<SPAN class=comment>//   ii) 假如栈顶是开括号，将此运算符压栈。</SPAN>
+<SPAN class=comment>//   iii) 假如此运算符比栈顶运算符优先级高，将此运算符压入栈中。</SPAN>
+<SPAN class=comment>//   iv) 否则栈顶运算符出栈并输出，重复步骤4。</SPAN>
+<SPAN class=comment>// 5)假如是个闭括号，栈中运算符逐个出栈并输出，直到遇到开括号。开括号出栈并丢弃。</SPAN>
+<SPAN class=comment>// 6)假如输入还未完毕，跳转到步骤1。</SPAN>
+<SPAN class=comment>// 7)假如输入完毕，栈中剩余的所有操作符出栈并输出它们。</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>stdio.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"stack.h"</SPAN>
+
+<SPAN class=comment>// 返回操作符的优先级</SPAN>
+<SPAN class=comment>// +和-的优先级是一样的，*和/的优先级也是一样的，但+和-的优先级要比*和/的低。</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>GetPRI</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>optr</SPAN>)
+{
+    <SPAN class=keyword>switch</SPAN> (<SPAN class=variable>optr</SPAN>)
+    {
+    <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'+'</SPAN>: <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+    <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'-'</SPAN>: <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN>;
+    <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'*'</SPAN>: <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>2</SPAN>;
+    <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'/'</SPAN>: <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>2</SPAN>;
+    <SPAN class=keyword>default</SPAN> : <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+    }
+}
+
+<SPAN class=comment>// 在这个函数中完成对栈顶的操作符和当前操作符的优先级对比，</SPAN>
+<SPAN class=comment>// 并决定是输出当前的操作符还是对当前的操作符进行入栈处理。</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>ProcessStackPRI</SPAN>(
+    <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=keyword>char</SPAN>&gt; <SPAN class=variable>&amp;stack</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>optr</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>**szPostfix</SPAN>
+)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>*szPostfix</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN>;
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>chStackOptr</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.GetCount</SPAN>();
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.top</SPAN>(<SPAN class=variable>&amp;chStackOptr</SPAN>);
+        <SPAN class=keyword>if</SPAN> (
+            (<SPAN class=selfeval>0</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>nRetCode</SPAN>) ||                  <SPAN class=comment>// 栈顶为空，新操作符添加到栈顶</SPAN>
+            (<SPAN class=variable>GetPRI</SPAN>(<SPAN class=variable>chStackOptr</SPAN>) &lt; <SPAN class=variable>GetPRI</SPAN>(<SPAN class=variable>optr</SPAN>))<SPAN class=comment>// 栈顶操作符优先级比当前的要低</SPAN>
+        )
+        {
+            <SPAN class=variable>stack.push</SPAN>(<SPAN class=variable>optr</SPAN>);
+            <SPAN class=keyword>break</SPAN>;
+        }
+        <SPAN class=keyword>else</SPAN>
+        {
+            <SPAN class=comment>// 如果栈顶操作符优先级不低于当前的，则栈顶元素出栈并输出：</SPAN>
+            <SPAN class=variable>stack.pop</SPAN>();
+            <SPAN class=variable>*</SPAN>(<SPAN class=variable>*szPostfix</SPAN>)<SPAN class=variable>++</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>chStackOptr</SPAN>;
+        }
+    }
+}
+
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>Infix2Postfix</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>*szInfix</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>*szPostfix</SPAN>
+)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>szPostfix</SPAN>);
+
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>chOptr</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nRetCode</SPAN>;
+    <SPAN class=variable>CStack</SPAN>&lt;<SPAN class=keyword>char</SPAN>&gt; <SPAN class=variable>stack</SPAN>;
+
+    <SPAN class=keyword>while</SPAN> (<SPAN class=variable>*szInfix</SPAN>)
+    {
+        <SPAN class=keyword>switch</SPAN> (<SPAN class=variable>*szInfix</SPAN>)
+        {
+        <SPAN class=comment>// 忽略空格和TAB：</SPAN>
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>' '</SPAN>:
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'\t'</SPAN>:
+            <SPAN class=keyword>break</SPAN>;
+
+        <SPAN class=comment>// 对操作符进行优先级判断，以便决定是入栈还是输出：</SPAN>
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'+'</SPAN>:
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'-'</SPAN>:
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'*'</SPAN>:
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'/'</SPAN>:
+            <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.IsEmpty</SPAN>();
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>!nRetCode</SPAN>)
+                <SPAN class=variable>ProcessStackPRI</SPAN>(<SPAN class=variable>stack</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>*szInfix</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;szPostfix</SPAN>);
+            <SPAN class=keyword>else</SPAN>
+                <SPAN class=variable>stack.push</SPAN>(<SPAN class=variable>*szInfix</SPAN>);   <SPAN class=comment>// 当栈为空时，毫无疑问操作符应该入栈</SPAN>
+            <SPAN class=keyword>break</SPAN>;
+
+        <SPAN class=comment>// 遇到左括号时，无条件入栈，因为它的优先级是最高的</SPAN>
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>'('</SPAN>:
+            <SPAN class=variable>stack.push</SPAN>(<SPAN class=variable>*szInfix</SPAN>);
+            <SPAN class=keyword>break</SPAN>;
+
+        <SPAN class=comment>// 遇到右括号时，逐个把栈中的操作符出栈，直到遇到左括号为止</SPAN>
+        <SPAN class=keyword>case</SPAN> <SPAN class=selfeval>')'</SPAN>:
+            <SPAN class=keyword>do</SPAN>
+            {
+                <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.pop</SPAN>(<SPAN class=variable>&amp;chOptr</SPAN>);
+                <SPAN class=keyword>if</SPAN> (<SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=selfeval>'('</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>chOptr</SPAN>))            <SPAN class=comment>// 左括号本身不输出</SPAN>
+                    <SPAN class=variable>*szPostfix++</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>chOptr</SPAN>;
+            } <SPAN class=keyword>while</SPAN> (<SPAN class=variable>!stack.IsEmpty</SPAN>() <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=selfeval>'('</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>chOptr</SPAN>));  <SPAN class=comment>// 遇到左括号为止</SPAN>
+            <SPAN class=keyword>break</SPAN>;
+
+        <SPAN class=comment>// 其余的情况，直接输出即可</SPAN>
+        <SPAN class=keyword>default</SPAN>:
+            <SPAN class=variable>*szPostfix++</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>*szInfix</SPAN>;
+            <SPAN class=keyword>break</SPAN>;
+        }
+        <SPAN class=variable>++szInfix</SPAN>;
+    }
+    <SPAN class=comment>// 如果输入的内容已经分析完毕，那么就把栈中剩余的操作符全部出栈</SPAN>
+    <SPAN class=keyword>while</SPAN> (<SPAN class=variable>!stack.IsEmpty</SPAN>())
+    {
+        <SPAN class=variable>nRetCode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>stack.pop</SPAN>(<SPAN class=variable>&amp;chOptr</SPAN>);
+        <SPAN class=variable>*szPostfix++</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>chOptr</SPAN>;
+    }
+    <SPAN class=variable>*szPostfix</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>'\0'</SPAN>;
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>*szInfix</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>"a+b*c+(d*e+f)*g"</SPAN>;
+    <SPAN class=keyword>char</SPAN> <SPAN class=variable>szPostfix</SPAN>[<SPAN class=selfeval>255</SPAN>];
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>Infix2Postfix</SPAN>(<SPAN class=variable>szInfix</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>szPostfix</SPAN>);
+
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"Infix   : %s\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>szInfix</SPAN>);
+    <SPAN class=variable>printf</SPAN>(<SPAN class=selfeval>"Postfix : %s\n"</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>szPostfix</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_5.4.2></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_5.4.2">5.4.2&nbsp;&nbsp;说明</A></H3>
+<P>源代码里面已经有了详细的注释，我就不再罗嗦了。我只做了+、-、*、/四种操作符的转换，另外，如果括号不匹配，例如有左括号但是没有右括号，或者反过来，程序就可能会运行不正确，但这不是我写这个例子的重点，我写它只是为了掌握栈的用法，如果您有兴趣，可以试着完善它。</P>
+<P>下面给出两个例子：</P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>中缀表达式：a</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>b</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=variable>c</SPAN> <SPAN class=variable>+</SPAN> (<SPAN class=variable>d</SPAN> <SPAN class=variable>*</SPAN> <SPAN class=variable>e</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>f</SPAN>) <SPAN class=variable>*</SPAN> <SPAN class=variable>g</SPAN>
+<SPAN class=variable>后缀表达式：abc*+de*f+g*+</SPAN>
+</PRE></DIV>
+<P></P>
+<P></P>
+<DIV align=left><PRE class=scheme><SPAN class=variable>中缀表达式：2</SPAN> <SPAN class=variable>*</SPAN> (<SPAN class=variable>x</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>y</SPAN>) <SPAN class=variable>/</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>-</SPAN> <SPAN class=variable>x</SPAN>)
+<SPAN class=variable>后缀表达式：2xy+*1x-/</SPAN>
+</PRE></DIV>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-5.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-7.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

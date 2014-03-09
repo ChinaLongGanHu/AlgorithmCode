@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-5.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记4.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-4.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-6.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_4></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_4">第四章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_4">循环链表</A></H1>
+<P></P><A name=node_sec_4.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_4.1">4.1&nbsp;&nbsp;基本概念</A></H2>
+<P>循环链表可以为单链表，也可以为双链表，但我不想把问题搞得那么复杂，姑且就做单链表的循环形式吧。</P>
+<P>我们在实现了链表后，必然会提出一个问题：链表能不能首尾相连？怎样实现？</P>
+<P>答案：能。其实实现的方法很简单，就是将表中最后一个结点的指针域指向头结点即可（P-&gt;next = 
+head;）。这种形成环路的链表称为循环链表。</P>
+<P>试想我们在学校的运动场上跑步锻炼身体（学校……好遥远的记忆啊），绕着400米跑道一直跑啊跑，好像永远没有尽头一样。这是因为跑道的首尾是相连的，跑完一圈后，“尾巴”突然就变成了“头”，这跟循环链表的原理是一样的。好了，明白了这个道理，实现起来就简单了，不过要注意的是，在循环链表里面如果要获得结点的个数，不能采用while()循环来遍历表，因为这个循环是永不会结束的，这就像无论有多长的长跑比赛都可以在400米的跑道上进行一样。我的做法还是通过增加一个m_nCount变量，每次新增或删除一个结点就对m_nCount进行相应的操作。</P>
+<P>循环链表的特点：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>从任一结点出发均可找到表中其他结点。 </P>
+  <LI>
+  <P>操作仅有一点与单链表不同：循环条件。 </P>
+  <UL>
+    <LI>
+    <P>单链表：P = NULL 或 P-&gt;next = NULL </P>
+    <LI>
+    <P>循环链表：P = head 或 P-&gt;next = head </P></LI></UL>
+  <P></P></LI></OL>
+<P></P>
+<P></P><A name=node_sec_4.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_4.2">4.2&nbsp;&nbsp;代码实现</A></H2>
+<P>循环链表的实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   clist.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-5 10:43:17</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__CIRC_LIST_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__CIRC_LIST_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../slist/src/slist.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CCList</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CSList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;
+{
+<SPAN class=keyword>protected</SPAN>:
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*m_pNodeCurr</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CCList</SPAN>();
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>T&amp;</SPAN>      <SPAN class=variable>GetNext</SPAN>();
+    <SPAN class=keyword>void</SPAN>    <SPAN class=variable>RemoveAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>GetCurrentIndex</SPAN>() <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CCList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetNext</SPAN>()
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> ((<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeCurr</SPAN>) || (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeCurr-</SPAN>&gt;<SPAN class=variable>next</SPAN>))
+        <SPAN class=variable>m_pNodeCurr</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=variable>m_pNodeCurr</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeCurr-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_pNodeCurr-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CCList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetCurrentIndex</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>0</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeCurr</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=variable>i</SPAN>;
+        <SPAN class=keyword>else</SPAN>
+            <SPAN class=variable>pTmpNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CCList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>RemoveAt</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=selfeval>1</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>pos</SPAN> <SPAN class=variable>&amp;&amp;</SPAN> <SPAN class=variable>pos</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>m_nCount</SPAN>);
+
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode1</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pTmpNode2</SPAN>;
+
+    <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead</SPAN>;
+
+    <SPAN class=comment>// head node?</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pos</SPAN>)
+    {
+        <SPAN class=variable>m_pNodeHead</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>m_pNodeHead-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+
+        <SPAN class=comment>// added for loop list</SPAN>
+        <SPAN class=comment>// m_pNodeCurr will be set to m_pNodeHead in function GetNext()</SPAN>
+        <SPAN class=variable>m_pNodeCurr</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+
+        <SPAN class=keyword>goto</SPAN> <SPAN class=variable>Exit1</SPAN>;
+    }
+
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt; <SPAN class=variable>pos</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=comment>// we will get the previous node of the target node after</SPAN>
+        <SPAN class=comment>// the for loop finished, and it would be stored into pTmpNode2</SPAN>
+        <SPAN class=variable>pTmpNode2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+        <SPAN class=variable>pTmpNode1</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+    }
+    <SPAN class=variable>pTmpNode2-</SPAN>&gt;<SPAN class=variable>next</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode1-</SPAN>&gt;<SPAN class=variable>next</SPAN>;
+
+    <SPAN class=comment>// added for loop list</SPAN>
+    <SPAN class=variable>m_pNodeCurr</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pTmpNode2</SPAN>;
+
+<SPAN class=variable>Exit1</SPAN>:
+    <SPAN class=keyword>delete</SPAN> <SPAN class=variable>pTmpNode1</SPAN>;
+    <SPAN class=variable>--m_nCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CCList</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>CCList</SPAN>() : <SPAN class=variable>m_pNodeCurr</SPAN>(<SPAN class=builtin>NULL</SPAN>)
+{
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __CIRC_LIST_H__</SPAN></PRE>
+<P></P>
+<P></P><A name=node_sec_4.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_4.3">4.3&nbsp;&nbsp;说明</A></H2>
+<P>由于循环链表的操作大部分是与非循环链表相同的，因此我的循环链表是直接从单链表继承来的，并且新增了表示当前结点的变量m_pNodeCurr，以及重载了几个函数。但还有两点是需要特别注意的：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>在GetNext()函数中，必须有判断当前结点应该如何指向下一个结点的条件。 </P>
+  <LI>
+  <P>在RemoveAt()函数中，如果要删除一个结点，而该结点又恰好是头结点的话，那么当前结点必须指向NULL，这样才能在GetNext()中重新获得头结点的正确的值。 
+  </P></LI></OL>
+<P></P>
+<P>关于这两点应该毫无疑问吧？呵呵，那就让我们继续吧……什么？你不明白第二点是什么意思？我倒！</P>
+<P>让我们来假定一下，如果当前结点指向了尾结点，然后这时我们调用了GetNext()，那么很显然，当前结点就应该指向头结点了。但问题是头结点已经被我们删除了，那么当前结点还能指向哪里呢？这时什么事情都可能发生，计算机可能会格式化了你的硬盘，也可能会把你的情书送给了班里的恐龙，更可能会告诉你的老板你愿意从此以后一分钱工资都不要一直做到over为止……但最有可能发生的事情是产生一个内存访问的异常，所以，咳咳，计算机是很笨的，必须由我们亲自告诉它：“头结点已经完蛋啦，所以当前结点就指向NULL吧，你在GetNext()函数中自个儿给我解决好下一步的问题。”</P>
+<P>明白了吗？还不明白的话……我……</P>
+<P></P><A name=node_sec_4.4></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_4.4">4.4&nbsp;&nbsp;应用：约瑟夫问题</A></H2>
+<P>约瑟夫问题几乎是最经典的用来讲解循环链表的案例了。为什么呢？我们来看看这个问题的描述就会明白了：</P>
+<P>有一队由n个冒险家组成的探险队深入到热带雨林中，但他们遭遇到了食人族，食人族的游戏规则是让他们围成一圈，然后选定一个数字m，从第1个人开始报数，报到m时，这个人就要被吃掉了，然后从下一个人开始又重新从1报数，重复这个过程，直到剩下最后一个人，这个人是幸运者，可以离开而不被吃掉。那么问题是，谁是这个幸运者呢？</P>
+<P>我们来举个例子：</P>
+<P>假设这个探险队有6个探险家，食人族选定的数字m是5，那么在第一轮中，5号会被吃掉，剩下的就是：1, 2, 3, 4, 
+6总共5个人，然后从6号开始，重新从1开始报5个数：6, 1, 2, 3, 4，所以在第二轮里面被吃掉的就是4号……一直重复这个过程，按顺序应该是：5, 4, 
+6, 2, 3被吃掉，剩下1号活下来。</P>
+<P>解决这个问题并不是只能用循环链表的，但使用循环链表应该是最方便的。我写的代码如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   joseph.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-5 13:56:32</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"clist.h"</SPAN>
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>i</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>n</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nNumber</SPAN>;
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>nCurIndex</SPAN>;
+    <SPAN class=variable>CCList</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>clist</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"请输入总的人数： "</SPAN>;
+    <SPAN class=variable>cin</SPAN> &gt;&gt; <SPAN class=variable>n</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"请输入死亡号码： "</SPAN>;
+    <SPAN class=variable>cin</SPAN> &gt;&gt; <SPAN class=variable>m</SPAN>;
+
+    <SPAN class=comment>// 初始化序列号码列表：</SPAN>
+    <SPAN class=keyword>for</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>; <SPAN class=variable>i</SPAN> &lt;<SPAN class=variable>=</SPAN> <SPAN class=variable>n</SPAN>; <SPAN class=variable>++i</SPAN>)
+    {
+        <SPAN class=variable>clist.AddTail</SPAN>(<SPAN class=variable>i</SPAN>);
+    }
+
+    <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+    <SPAN class=keyword>do</SPAN>
+    {
+        <SPAN class=variable>++i</SPAN>;
+        <SPAN class=variable>nNumber</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>clist.GetNext</SPAN>();
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>i</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m</SPAN>)
+        {
+            <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"第 "</SPAN> &lt;&lt; <SPAN class=variable>nNumber</SPAN> &lt;&lt; <SPAN class=selfeval>" 个人被吃掉了！"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+            <SPAN class=comment>// 这个人倒霉了</SPAN>
+            <SPAN class=variable>nCurIndex</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>clist.GetCurrentIndex</SPAN>();
+            <SPAN class=variable>clist.RemoveAt</SPAN>(<SPAN class=variable>nCurIndex</SPAN>);
+            <SPAN class=variable>--n</SPAN>;
+
+            <SPAN class=comment>// 剩下的人重新开始报数</SPAN>
+            <SPAN class=variable>i</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+        }
+    } <SPAN class=keyword>while</SPAN> (<SPAN class=selfeval>1</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>n</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"最后活下来的是： "</SPAN> &lt;&lt; <SPAN class=variable>clist.GetHead</SPAN>() &lt;&lt; <SPAN class=variable>endl</SPAN>;
+}</PRE>
+<P></P>
+<P>为了解决约瑟夫问题，我在循环链表中加入了GetCurrentIndex()函数，用来获得当前结点的索引值，以便删除当前结点。整个代码应该不难理解，实际动手做做就明白了。 
+:) </P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-4.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-6.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

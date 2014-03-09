@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-4.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记3.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-3.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-5.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_3></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_3">第三章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_3">双链表</A></H1>
+<P>单链表学完后，理所当然的就是轮到双链表了。</P>
+<P></P><A name=node_sec_3.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_3.1">3.1&nbsp;&nbsp;代码实现</A></H2>
+<P>双链表的实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   dlist.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-4 10:33:21</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__DOUBLE_LIST_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__DOUBLE_LIST_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>assert.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>crtdbg.h</SPAN>&gt;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>_NORMAL_BLOCK</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>THIS_FILE</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>__LINE__</SPAN>)
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN>
+<SPAN class=keyword>#undef</SPAN> <SPAN class=variable>THIS_FILE</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>THIS_FILE</SPAN>[] <SPAN class=variable>=</SPAN> <SPAN class=variable>__FILE__</SPAN>;
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>  <SPAN class=variable>assert</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#else</SPAN>   <SPAN class=comment>// not _DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// _DEBUG</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CNode</SPAN>
+{
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*prior</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*next</SPAN>;
+    <SPAN class=variable>CNode</SPAN>() : <SPAN class=variable>data</SPAN>(<SPAN class=variable>T</SPAN>())<SPAN class=keyword>,</SPAN> <SPAN class=variable>prior</SPAN>(<SPAN class=builtin>NULL</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>next</SPAN>(<SPAN class=builtin>NULL</SPAN>) {}
+    <SPAN class=variable>CNode</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN>) : <SPAN class=variable>data</SPAN>(<SPAN class=variable>initdata</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>prior</SPAN>(<SPAN class=builtin>NULL</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>next</SPAN>(<SPAN class=builtin>NULL</SPAN>) {}
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CDList</SPAN>
+{
+<SPAN class=keyword>protected</SPAN>:
+    <SPAN class=keyword>int</SPAN> <SPAN class=variable>m_nCount</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*m_pNodeHead</SPAN>;
+    <SPAN class=variable>CNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*m_pNodeTail</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CDList</SPAN>();
+    <SPAN class=variable>CDList</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;initdata</SPAN>);
+    <SPAN class=variable>~CDList</SPAN>();
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>IsEmpty</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>GetCount</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>InsertBefore</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>InsertAfter</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>pos</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>AddHead</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>);
+    <SPAN class=keyword>int</SPAN>     <SPAN class=variable>AddTail</SPAN>(&lt;span class=ke</PRE></BODY></HTML>

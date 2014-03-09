@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0049)http://www.luocong.com/dsaanotes/index-Z-H-11.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记10.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-10.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-12.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_10></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_10">第十章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_10">AVL树</A></H1>
+<P></P><A name=node_sec_10.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.1">10.1&nbsp;&nbsp;基本概念</A></H2>
+<P>AVL树的复杂程度真是比二叉搜索树高了整整一个数量级——它的原理并不难弄懂，但要把它用代码实现出来还真的有点费脑筋。下面我们来看看：</P>
+<P></P><A name=node_sec_10.1.1></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.1.1">10.1.1&nbsp;&nbsp;AVL树是什么？</A></H3>
+<P>AVL树本质上还是一棵二叉搜索树（因此读者可以看到我后面的代码是继承自二叉搜索树的），它的特点是：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>本身首先是一棵二叉搜索树。 </P>
+  <LI>
+  <P>带有平衡条件：每个结点的左右子树的高度之差的绝对值（平衡因子）最多为1。 </P></LI></OL>
+<P></P>
+<P>例如：</P>
+<P></P><PRE class=scheme>     <SPAN class=selfeval>5</SPAN>              <SPAN class=selfeval>5</SPAN>
+    <SPAN class=variable>/</SPAN> <SPAN class=variable>\ </SPAN>           <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>2</SPAN>   <SPAN class=selfeval>6</SPAN>          <SPAN class=selfeval>2</SPAN>   <SPAN class=selfeval>6</SPAN>
+  <SPAN class=variable>/</SPAN> <SPAN class=variable>\ </SPAN>  <SPAN class=variable>\ </SPAN>       <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN> <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>4</SPAN>   <SPAN class=selfeval>7</SPAN>      <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>4</SPAN>
+    <SPAN class=variable>/</SPAN>              <SPAN class=variable>/</SPAN>
+   <SPAN class=selfeval>3</SPAN>              <SPAN class=selfeval>3</SPAN>
+</PRE>
+<P></P>
+<P>上图中，左边的是AVL树，而右边的不是。因为左边的树的每个结点的左右子树的高度之差的绝对值都最多为1，而右边的树由于结点6没有子树，导致根结点5的平衡因子为2。</P>
+<P></P><A name=node_sec_10.1.2></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.1.2">10.1.2&nbsp;&nbsp;为什么要用AVL树？</A></H3>
+<P>有人也许要问：为什么要有AVL树呢？它有什么作用呢？</P>
+<P>我们先来看看二叉搜索树吧（因为AVL树本质上是一棵二叉搜索树），假设有这么一种极端的情况：二叉搜索树的结点为1、2、3、4、5，也就是：</P>
+<P></P><PRE class=scheme> <SPAN class=selfeval>1</SPAN>
+  <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>2</SPAN>
+    <SPAN class=variable>\
+</SPAN>     <SPAN class=selfeval>3</SPAN>
+      <SPAN class=variable>\
+</SPAN>       <SPAN class=selfeval>4</SPAN>
+        <SPAN class=variable>\
+</SPAN>         <SPAN class=selfeval>5</SPAN>
+</PRE>
+<P></P>
+<P>聪明的你是不是发现什么了呢？呵呵，显而易见——这棵二叉搜索树其实等同于一个链表了，也就是说，它在查找上的优势已经全无了——在这种情况下，查找一个结点的时间复杂度是O(N)！</P>
+<P>好，那么假如是AVL树（别忘了AVL树还是二叉搜索树），则会是：</P>
+<P></P><PRE class=scheme>   <SPAN class=selfeval>2</SPAN>
+  <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN> <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>4</SPAN>
+    <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>3</SPAN>   <SPAN class=selfeval>5</SPAN>
+</PRE>
+<P></P>
+<P>可以看出，AVL树的查找平均时间复杂度要比二叉搜索树低——它是O(logN)。也就是说，在大量的随机数据中AVL树的表现要好得多。</P>
+<P></P><A name=node_sec_10.1.3></A>
+<H3><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.1.3">10.1.3&nbsp;&nbsp;旋转</A></H3>
+<P>假设有一个结点的平衡因子为2（在AVL树中，最大就是2，因为结点是一个一个地插入到树中的，一旦出现不平衡的状态就会立即进行调整，因此平衡因子最大不可能超过2），那么就需要进行调整。由于任意一个结点最多只有两个儿子，所以当高度不平衡时，只可能是以下四种情况造成的：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>对该结点的左儿子的左子树进行了一次插入。 </P>
+  <LI>
+  <P>对该结点的左儿子的右子树进行了一次插入。 </P>
+  <LI>
+  <P>对该结点的右儿子的左子树进行了一次插入。 </P>
+  <LI>
+  <P>对该结点的右儿子的右子树进行了一次插入。 </P></LI></OL>
+<P></P>
+<P>情况1和4是关于该点的镜像对称，同样，情况2和3也是一对镜像对称。因此，理论上只有两种情况，当然了，从编程的角度来看还是四种情况。</P>
+<P>第一种情况是插入发生在“外边”的情况（即左-左的情况或右-右的情况），该情况可以通过对树的一次单旋转来完成调整。第二种情况是插入发生在“内部”的情况（即左-右的情况或右-左的情况），该情况要通过稍微复杂些的双旋转来处理。</P>
+<P>关于旋转的具体理论分析和例子请参阅教科书，我实在不想在这里重新打一次了……就此省略65535个字，原谅我吧，出来混，迟早要还的。</P>
+<P></P><A name=node_sec_10.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.2">10.2&nbsp;&nbsp;代码实现</A></H2>
+<P>二叉树的代码实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   avltree.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-20 17:04:31</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__AVL_TREE_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__AVL_TREE_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"../../bstree/src/bstree.h"</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CAVLTree</SPAN> : <SPAN class=keyword>public</SPAN> <SPAN class=variable>CBSTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;
+{
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>DoubleRotateWithLeft</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>SingleRotateWithRight</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>DoubleRotateWithRight</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>);
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p2</SPAN>;
+
+    <SPAN class=comment>// rotate</SPAN>
+    <SPAN class=variable>p2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>;
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>right</SPAN>;
+    <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+    <SPAN class=comment>// update parent relationship</SPAN>
+    <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2</SPAN>;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+    <SPAN class=comment>// update root node if necessary</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>)
+        <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p2</SPAN>;  <SPAN class=comment>// New root</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>DoubleRotateWithLeft</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>p</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>SingleRotateWithRight</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p2</SPAN>;
+
+    <SPAN class=comment>// rotate</SPAN>
+    <SPAN class=variable>p2</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>;
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>left</SPAN>;
+    <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+    <SPAN class=comment>// update parent relationship</SPAN>
+    <SPAN class=variable>p2-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2</SPAN>;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+    <SPAN class=comment>// update root node if necessary</SPAN>
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>)
+        <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p2</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p2</SPAN>;  <SPAN class=comment>// New root</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>DoubleRotateWithRight</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>SingleRotateWithRight</SPAN>(<SPAN class=variable>p</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Insert</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=comment>// Create and return a one-node tree</SPAN>
+        <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+        <SPAN class=keyword>else</SPAN>
+        {
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>)
+            {
+                <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+                <SPAN class=variable>m_pNodeRoot-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+            }
+        }
+    }
+    <SPAN class=comment>// left child</SPAN>
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &lt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+        <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>2</SPAN> <SPAN class=variable>==</SPAN> (<SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>) <SPAN class=variable>-</SPAN> <SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)))
+        {
+            <SPAN class=comment>// left tree, need to do single rotation</SPAN>
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &lt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+                <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>SingleRotateWithLeft</SPAN>(<SPAN class=variable>p</SPAN>);
+            <SPAN class=comment>// right tree, need to do double rotation</SPAN>
+            <SPAN class=keyword>else</SPAN>
+                <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>DoubleRotateWithLeft</SPAN>(<SPAN class=variable>p</SPAN>);
+        }
+    }
+    <SPAN class=comment>// right child</SPAN>
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &gt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+    {
+        <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Insert</SPAN>(<SPAN class=variable>data</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>)
+            <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+
+        <SPAN class=keyword>if</SPAN> (<SPAN class=selfeval>2</SPAN> <SPAN class=variable>==</SPAN> (<SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>) <SPAN class=variable>-</SPAN> <SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>)))
+        {
+            <SPAN class=comment>// right tree, need to do single rotation</SPAN>
+            <SPAN class=keyword>if</SPAN> (<SPAN class=variable>data</SPAN> &gt; <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right-</SPAN>&gt;<SPAN class=variable>data</SPAN>)
+                <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>SingleRotateWithRight</SPAN>(<SPAN class=variable>p</SPAN>);
+            <SPAN class=comment>// left tree, need to do double rotation</SPAN>
+            <SPAN class=keyword>else</SPAN>
+                <SPAN class=variable>p</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>DoubleRotateWithRight</SPAN>(<SPAN class=variable>p</SPAN>);
+        }
+    }
+    <SPAN class=comment>// else data is in the tree already, we'll do nothing!</SPAN>
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=keyword>Delete</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=comment>// not completed yet.</SPAN>
+    <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __AVL_TREE_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   avltree.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-20 17:06:50</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"avltree.h"</SPAN>
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CAVLTree</SPAN>&lt;<SPAN class=keyword>int</SPAN>&gt; <SPAN class=variable>avltree</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>avltree.Insert</SPAN>(<SPAN class=selfeval>1</SPAN>);
+    <SPAN class=variable>avltree.Insert</SPAN>(<SPAN class=selfeval>2</SPAN>);
+    <SPAN class=variable>avltree.Insert</SPAN>(<SPAN class=selfeval>3</SPAN>);
+    <SPAN class=variable>avltree.Insert</SPAN>(<SPAN class=selfeval>4</SPAN>);
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_10.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_10.3">10.3&nbsp;&nbsp;说明</A></H2>
+<P>我的AVL树是从二叉搜索树继承而来的（还记得我的二叉搜索树又是从二叉树继承来的吗？^_^）。另外，由于水平的关系，我没有写出Delete()函数来，因此如果您使用了Delete()，那是不会有效果的。-_-b...</P>
+<P>插入的核心思路是通过递归（又是递归！）找到合适的位置，插入新结点，然后看新结点是否平衡（平衡因子是否为2），如果不平衡的话，就分成两种大情况以及两种小情况：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>在结点的左儿子(data &lt; p-&gt;data) </P>
+  <UL>
+    <LI>
+    <P>在左儿子的左子树((data &lt; p-&gt;data) AND (data &lt; 
+    p-&gt;left-&gt;data))，“外边”，要做单旋转。 </P>
+    <LI>
+    <P>在左儿子的右子树((data &lt; p-&gt;data) AND (data &gt; 
+    p-&gt;left-&gt;data0))，“内部”，要做双旋转。 </P></LI></UL>
+  <P></P>
+  <LI>
+  <P>在结点的右儿子(data &gt; p-&gt;data) </P>
+  <UL>
+    <LI>
+    <P>在右儿子的左子树((data &gt; p-&gt;data) AND (data &lt; 
+    p-&gt;right-&gt;data))，“内部”，要做双旋转。 </P>
+    <LI>
+    <P>在右儿子的右子树((data &gt; p-&gt;data) AND (data &gt; 
+    p-&gt;right-&gt;data))，“外边”，要做单旋转。 </P></LI></UL>
+  <P></P></LI></OL>
+<P></P>
+<P>代码已经写得很清楚了，我就不多废话了，关键在于动手去调试，这样才能弄明白。值得说明的是，当进行了旋转之后，必定会有结点的“父结点”是需要更新的，例如：</P>
+<P></P><PRE class=scheme>   <SPAN class=selfeval>2</SPAN>
+  <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN> <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>4</SPAN>
+    <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>3</SPAN>   <SPAN class=selfeval>5</SPAN>
+        <SPAN class=variable>\
+</SPAN>         <SPAN class=selfeval>6</SPAN>
+</PRE>
+<P></P>
+<P>上图是调整前的，下图是调整后的：</P>
+<P></P><PRE class=scheme>     <SPAN class=selfeval>4</SPAN>
+    <SPAN class=variable>/</SPAN> <SPAN class=variable>\
+</SPAN>   <SPAN class=selfeval>2</SPAN>   <SPAN class=selfeval>5</SPAN>
+  <SPAN class=variable>/</SPAN> <SPAN class=variable>\ </SPAN>  <SPAN class=variable>\
+</SPAN> <SPAN class=selfeval>1</SPAN>   <SPAN class=selfeval>3</SPAN>   <SPAN class=selfeval>6</SPAN>
+</PRE>
+<P></P>
+<P>可以看出，根结点2不平衡，是由于它的右儿子的右子树插入了新的结点6造成的。因此，这属于“外边”的情况，要进行一次单旋转。于是我们就把结点4调整上来作为根结点，再把结点2作为4的左儿子，最后把结点2的右儿子修改为原来的结点4的左儿子。</P>
+<P>调整后的parent指针变化规律如下：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>调整前的右儿子（调整后它就变为父亲了）的parent指针应该指向调整前的父亲（调整后它就变成左儿子了）的parent指针。 </P>
+  <LI>
+  <P>调整前的父亲（调整后它就变成左儿子了）的parent指针应该指向调整前的右儿子（调整后它就变成父亲了）。 </P>
+  <LI>
+  <P>调整前的父亲的右儿子的parent指针应该指向调整前的右儿子的左儿子。 </P></LI></OL>
+<P></P>
+<P>很难理解是吗？我来联系到上图说明：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>调整前的右儿子是结点4，调整后，它的parent指针应该指向调整前它的父亲的parent指针，也就是NULL，因为调整前结点4的父亲是结点2，而结点2是根结点，其parent指针为NULL。 
+  </P>
+  <LI>
+  <P>调整前的父亲是结点2，调整后，它的parent指针应该指向调整前的右儿子（结点4）。 </P>
+  <LI>
+  <P>调整前的父亲的右儿子（也就是调整后的结点2的右儿子）应该指向调整前的右儿子（结点4）的左儿子（结点3）。 </P></LI></OL>
+<P></P>
+<P>这是SingleRotateWithRight()里面对parent指针的处理，SingleRotateWithLeft()里面的道理也是相通的，只是顺序有点不同。</P>
+<P>呵呵，希望没把您弄晕。^_^</P>
+<P>AVL树就讲到这里了，如果您有兴趣，可以把Delete()函数写完，并请给我一份以便我学习。 </P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-10.htm">上一页</A></SPAN><SPAN>, 
+<A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-12.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>

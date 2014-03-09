@@ -1,0 +1,618 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0048)http://www.luocong.com/dsaanotes/index-Z-H-9.htm -->
+<HTML><HEAD><TITLE>数据结构与算法分析 学习笔记</TITLE><!--
+
+Generated from index.tex by tex2page, v 2004-09-11
+(running on MzScheme 205, windows), 
+(c) Dorai Sitaram, 
+http://www.ccs.neu.edu/~dorai/tex2page/tex2page-doc.html
+
+--><LINK 
+title=default href="数据结构与算法分析 学习笔记8.files/main.css" type=text/css 
+rel=stylesheet><LINK title=default href="index-Z-S.css" type=text/css 
+rel=stylesheet>
+<META content=noindex,follow name=robots>
+<META http-equiv=Content-Type content=text/html;charset=gb2312>
+<META content="MSHTML 6.00.2900.3157" name=GENERATOR></HEAD>
+<BODY>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-8.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-10.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P><A name=node_chap_8></A>
+<H1 class=chapter>
+<DIV class=chapterheading><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_8">第八章</A></DIV><BR><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_chap_8">二叉树</A></H1>
+<P></P><A name=node_sec_8.1></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_8.1">8.1&nbsp;&nbsp;基本概念</A></H2>
+<P>树是一种非线性的数据结构，它在客观世界中广泛存在，例如人类社会的族谱和各种社会组织机构都可以用树来表示。我们最常用到的是树和二叉树，其中又以二叉树更为实用。为什么这样说呢？因为大部分的操作都可以转变为一个父亲、一个左儿子和一个右儿子来实现，而且对二叉树的操作更为简单。</P>
+<P></P><A name=node_sec_8.2></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_8.2">8.2&nbsp;&nbsp;代码实现</A></H2>
+<P>二叉树的代码实现如下：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   btree.h</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-12 12:22:40</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>__BINARY_TREE_H__</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>__BINARY_TREE_H__</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>assert.h</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>crtdbg.h</SPAN>&gt;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN> <SPAN class=keyword>new</SPAN> (<SPAN class=variable>_NORMAL_BLOCK</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>THIS_FILE</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>__LINE__</SPAN>)
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>DEBUG_NEW</SPAN>
+<SPAN class=keyword>#undef</SPAN> <SPAN class=variable>THIS_FILE</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>THIS_FILE</SPAN>[] <SPAN class=variable>=</SPAN> <SPAN class=variable>__FILE__</SPAN>;
+<SPAN class=keyword>#endif</SPAN>
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>  <SPAN class=variable>assert</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#else</SPAN>   <SPAN class=comment>// not _DEBUG</SPAN>
+<SPAN class=keyword>#ifndef</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#define</SPAN> <SPAN class=variable>ASSERT</SPAN>
+<SPAN class=keyword>#endif</SPAN>
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// _DEBUG</SPAN>
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CBTNode</SPAN>
+{
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*parent</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*left</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*right</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>(
+        <SPAN class=variable>T</SPAN> <SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>T</SPAN>()<SPAN class=keyword>,</SPAN>
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN><SPAN class=keyword>,</SPAN>
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN><SPAN class=keyword>,</SPAN>
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>
+    ) : <SPAN class=variable>data</SPAN>(<SPAN class=variable>data</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>parent</SPAN>(<SPAN class=variable>parent</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>left</SPAN>(<SPAN class=variable>left</SPAN>)<SPAN class=keyword>,</SPAN> <SPAN class=variable>right</SPAN>(<SPAN class=variable>right</SPAN>) {}
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>class</SPAN> <SPAN class=variable>CBTree</SPAN>
+{
+<SPAN class=keyword>protected</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*m_pNodeRoot</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>CBTree</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*initroot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>);
+    <SPAN class=variable>~CBTree</SPAN>();
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>AssignTo</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>Copy</SPAN>(<SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>&amp;p</SPAN>);
+
+<SPAN class=keyword>private</SPAN>:
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>Copy</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>DestroyNode</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>PreOrderTraverse</SPAN>(
+        <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+        <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+    ) <SPAN class=keyword>const</SPAN>;
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>InOrderTraverse</SPAN>(
+        <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+        <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+    ) <SPAN class=keyword>const</SPAN>;
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>PostOrderTraverse</SPAN>(
+        <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+        <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+    ) <SPAN class=keyword>const</SPAN>;
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>GetNodesCount</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*unCount</SPAN>) <SPAN class=keyword>const</SPAN>;
+
+    <SPAN class=keyword>void</SPAN> <SPAN class=variable>GetLeafCount</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*unCount</SPAN>) <SPAN class=keyword>const</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=variable>T&amp;</SPAN>              <SPAN class=variable>GetNodeData</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>T</SPAN>               <SPAN class=variable>GetNodeData</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>void</SPAN>            <SPAN class=variable>SetNodeData</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetRoot</SPAN>();
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetRoot</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetParent</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetParent</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetLeftChild</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetLeftChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetRightChild</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetRightChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetLeftSibling</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetLeftSiblig</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN>    <SPAN class=variable>GetRightSibling</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>);
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN>     <SPAN class=variable>GetRightSibling</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+
+<SPAN class=keyword>public</SPAN>:
+    <SPAN class=keyword>int</SPAN>             <SPAN class=variable>IsEmpty</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>void</SPAN>            <SPAN class=variable>Destroy</SPAN>();
+    <SPAN class=keyword>void</SPAN>            <SPAN class=variable>PreOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>void</SPAN>            <SPAN class=variable>InOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>void</SPAN>            <SPAN class=variable>PostOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN>    <SPAN class=variable>GetNodesCount</SPAN>() <SPAN class=keyword>const</SPAN>; <SPAN class=comment>// Get how many nodes</SPAN>
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN>    <SPAN class=variable>GetLeafCount</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN>    <SPAN class=variable>GetDepth</SPAN>() <SPAN class=keyword>const</SPAN>;
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN>    <SPAN class=variable>GetDepth</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>;
+};
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>CBTree</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*initroot</SPAN>) : <SPAN class=variable>m_pNodeRoot</SPAN>(<SPAN class=variable>initroot</SPAN>)
+{
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>~CBTree</SPAN>()
+{
+    <SPAN class=variable>Destroy</SPAN>();
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>AssignTo</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Copy</SPAN>(<SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>&amp;p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>!=</SPAN> <SPAN class=variable>p.m_pNodeRoot</SPAN>)
+        <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Copy</SPAN>(<SPAN class=variable>p.m_pNodeRoot</SPAN>);
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Copy</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*pNewNode</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;;
+        <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pNewNode</SPAN>)
+            <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Copy</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+        <SPAN class=variable>pNewNode-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>Copy</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>pNewNode</SPAN>;
+    }
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeftChild</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>));
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeftChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRightChild</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>));
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRightChild</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeftSibling</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent-</SPAN>&gt;<SPAN class=variable>left</SPAN>));
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)); <SPAN class=comment>// return NULL;</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeftSiblig</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent-</SPAN>&gt;<SPAN class=variable>left</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;       <SPAN class=comment>// return NULL;</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRightSibling</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent-</SPAN>&gt;<SPAN class=variable>right</SPAN>));
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)); <SPAN class=comment>// return NULL;</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRightSibling</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent-</SPAN>&gt;<SPAN class=variable>right</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;       <SPAN class=comment>// return NULL;</SPAN>
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetParent</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>));
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetParent</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>parent</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetNodeData</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetNodeData</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>SetNodeData</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>p</SPAN>);
+    <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>IsEmpty</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*&amp;</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRoot</SPAN>()
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>*</SPAN>(<SPAN class=variable>&amp;</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN>));
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;<SPAN class=variable>*</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetRoot</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>m_pNodeRoot</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>DestroyNode</SPAN>(<SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>)
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>DestroyNode</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+        <SPAN class=variable>DestroyNode</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=keyword>delete</SPAN> <SPAN class=variable>p</SPAN>;
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>Destroy</SPAN>()
+{
+    <SPAN class=variable>DestroyNode</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN>);
+    <SPAN class=variable>m_pNodeRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>PreOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>PreOrderTraverse</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>PreOrderTraverse</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>);
+        <SPAN class=variable>PreOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+        <SPAN class=variable>PreOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>InOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>InOrderTraverse</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>InOrderTraverse</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>InOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+        <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>);
+        <SPAN class=variable>InOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>PostOrderTraverse</SPAN>(<SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>PostOrderTraverse</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>PostOrderTraverse</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>void</SPAN> (<SPAN class=variable>*Visit</SPAN>)(<SPAN class=keyword>const</SPAN> <SPAN class=variable>T</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>PostOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+        <SPAN class=variable>PostOrderTraverse</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>Visit</SPAN>);
+        <SPAN class=variable>Visit</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>data</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetNodesCount</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unCount</SPAN>;
+    <SPAN class=variable>GetNodesCount</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;unCount</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>unCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetNodesCount</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*unCount</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>unCount</SPAN>);
+
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unLeftCount</SPAN>;
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unRightCount</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p</SPAN>)
+        <SPAN class=variable>*unCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+    <SPAN class=keyword>else</SPAN> <SPAN class=keyword>if</SPAN> ((<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>) <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>))
+        <SPAN class=variable>*unCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN>;
+    <SPAN class=keyword>else</SPAN>
+    {
+        <SPAN class=variable>GetNodesCount</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;unLeftCount</SPAN>);
+        <SPAN class=variable>GetNodesCount</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;unRightCount</SPAN>);
+        <SPAN class=variable>*unCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>1</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>unLeftCount</SPAN> <SPAN class=variable>+</SPAN> <SPAN class=variable>unRightCount</SPAN>;
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeafCount</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unCount</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>0</SPAN>;
+    <SPAN class=variable>GetLeafCount</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>&amp;unCount</SPAN>);
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>unCount</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetLeafCount</SPAN>(
+    <SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN><SPAN class=keyword>,</SPAN>
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>*unCount</SPAN>
+) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=variable>ASSERT</SPAN>(<SPAN class=variable>unCount</SPAN>);
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=comment>// if the node's left &amp; right children are both NULL, it must be a leaf</SPAN>
+        <SPAN class=keyword>if</SPAN> ((<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>) <SPAN class=variable>&amp;&amp;</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>))
+            <SPAN class=variable>++</SPAN>(<SPAN class=variable>*unCount</SPAN>);
+        <SPAN class=variable>GetLeafCount</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>unCount</SPAN>);
+        <SPAN class=variable>GetLeafCount</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN><SPAN class=keyword>,</SPAN> <SPAN class=variable>unCount</SPAN>);
+    }
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetDepth</SPAN>() <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=comment>// Minus 1 here because I think the root node's depth should be 0.</SPAN>
+    <SPAN class=comment>// So, don't do it if u think the root node's depth should be 1.</SPAN>
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>m_pNodeRoot</SPAN>) <SPAN class=variable>-</SPAN> <SPAN class=selfeval>1</SPAN>;
+}
+
+<SPAN class=keyword>template</SPAN>&lt;<SPAN class=keyword>typename</SPAN> <SPAN class=variable>T</SPAN>&gt;
+<SPAN class=keyword>inline</SPAN> <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt;::<SPAN class=variable>GetDepth</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>T</SPAN>&gt; <SPAN class=variable>*p</SPAN>) <SPAN class=keyword>const</SPAN>
+{
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unDepthLeft</SPAN>;
+    <SPAN class=keyword>unsigned</SPAN> <SPAN class=keyword>int</SPAN> <SPAN class=variable>unDepthRight</SPAN>;
+
+    <SPAN class=keyword>if</SPAN> (<SPAN class=variable>p</SPAN>)
+    {
+        <SPAN class=variable>unDepthLeft</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>left</SPAN>);
+        <SPAN class=variable>unDepthRight</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>GetDepth</SPAN>(<SPAN class=variable>p-</SPAN>&gt;<SPAN class=variable>right</SPAN>);
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>1</SPAN> <SPAN class=variable>+</SPAN>  <SPAN class=comment>// if don't plus 1 here, the tree's depth will be always 0</SPAN>
+            (<SPAN class=variable>unDepthLeft</SPAN> &gt; <SPAN class=variable>unDepthRight</SPAN> <SPAN class=variable>?</SPAN> <SPAN class=variable>unDepthLeft</SPAN> : <SPAN class=variable>unDepthRight</SPAN>);
+    }
+    <SPAN class=keyword>else</SPAN>
+        <SPAN class=keyword>return</SPAN> <SPAN class=selfeval>0</SPAN>;
+}
+
+<SPAN class=keyword>#endif</SPAN>  <SPAN class=comment>// __BINARY_TREE_H__</SPAN></PRE>
+<P></P>
+<P>测试代码：</P>
+<P></P><PRE class=scheme><SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>//  FileName    :   btree.cpp</SPAN>
+<SPAN class=comment>//  Version     :   0.10</SPAN>
+<SPAN class=comment>//  Author      :   Luo Cong</SPAN>
+<SPAN class=comment>//  Date        :   2005-1-12 13:17:07</SPAN>
+<SPAN class=comment>//  Comment     :  </SPAN>
+<SPAN class=comment>//</SPAN>
+<SPAN class=comment>///////////////////////////////////////////////////////////////////////////////</SPAN>
+
+<SPAN class=keyword>#include</SPAN> &lt;<SPAN class=variable>iostream</SPAN>&gt;
+<SPAN class=keyword>#include</SPAN> <SPAN class=selfeval>"btree.h"</SPAN>
+<SPAN class=keyword>using</SPAN> <SPAN class=keyword>namespace</SPAN> <SPAN class=variable>std</SPAN>;
+
+<SPAN class=comment>// 结点的数据类型</SPAN>
+<SPAN class=keyword>typedef</SPAN> <SPAN class=keyword>char</SPAN> <SPAN class=variable>ElementType</SPAN>;
+
+<SPAN class=comment>// 回调函数：Visit() = PrintElement()</SPAN>
+<SPAN class=keyword>static</SPAN> <SPAN class=keyword>void</SPAN> <SPAN class=variable>PrintElement</SPAN>(<SPAN class=keyword>const</SPAN> <SPAN class=variable>ElementType</SPAN> <SPAN class=variable>&amp;data</SPAN>)
+{
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>data</SPAN>;
+}
+
+<SPAN class=keyword>int</SPAN> <SPAN class=variable>main</SPAN>()
+{
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt; <SPAN class=variable>*pRoot</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt; <SPAN class=variable>*pLeftChild</SPAN>;
+    <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt; <SPAN class=variable>*pRightChild</SPAN>;
+    <SPAN class=variable>CBTree</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt; <SPAN class=variable>btree</SPAN>;
+
+<SPAN class=keyword>#ifdef</SPAN> <SPAN class=variable>_DEBUG</SPAN>
+    <SPAN class=variable>_CrtSetDbgFlag</SPAN>(<SPAN class=variable>_CRTDBG_ALLOC_MEM_DF</SPAN> | <SPAN class=variable>_CRTDBG_LEAK_CHECK_DF</SPAN>);
+<SPAN class=keyword>#endif</SPAN>
+
+    <SPAN class=variable>pRoot</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pRoot</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>EXIT_FAILURE</SPAN>;
+
+    <SPAN class=variable>pLeftChild</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pLeftChild</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>EXIT_FAILURE</SPAN>;
+
+    <SPAN class=variable>pRightChild</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=keyword>new</SPAN> <SPAN class=variable>CBTNode</SPAN>&lt;<SPAN class=variable>ElementType</SPAN>&gt;;
+    <SPAN class=keyword>if</SPAN> (<SPAN class=builtin>NULL</SPAN> <SPAN class=variable>==</SPAN> <SPAN class=variable>pRightChild</SPAN>)
+        <SPAN class=keyword>return</SPAN> <SPAN class=variable>EXIT_FAILURE</SPAN>;
+
+    <SPAN class=comment>// 创建父亲结点</SPAN>
+    <SPAN class=variable>pRoot-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>'+'</SPAN>;
+    <SPAN class=variable>pRoot-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>pRoot-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pLeftChild</SPAN>;
+    <SPAN class=variable>pRoot-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pRightChild</SPAN>;
+
+    <SPAN class=comment>// 创建左儿子结点</SPAN>
+    <SPAN class=variable>pLeftChild-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>'a'</SPAN>;
+    <SPAN class=variable>pLeftChild-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pRoot</SPAN>;
+    <SPAN class=variable>pLeftChild-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>pLeftChild-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+
+    <SPAN class=comment>// 创建右儿子结点</SPAN>
+    <SPAN class=variable>pRightChild-</SPAN>&gt;<SPAN class=variable>data</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=selfeval>'b'</SPAN>;
+    <SPAN class=variable>pRightChild-</SPAN>&gt;<SPAN class=variable>parent</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=variable>pRoot</SPAN>;
+    <SPAN class=variable>pRightChild-</SPAN>&gt;<SPAN class=variable>left</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+    <SPAN class=variable>pRightChild-</SPAN>&gt;<SPAN class=variable>right</SPAN> <SPAN class=variable>=</SPAN> <SPAN class=builtin>NULL</SPAN>;
+
+    <SPAN class=comment>// 创建二叉树</SPAN>
+    <SPAN class=variable>btree.AssignTo</SPAN>(<SPAN class=variable>pRoot</SPAN>);
+
+    <SPAN class=comment>// 输出这棵二叉树</SPAN>
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"   ("</SPAN> &lt;&lt; <SPAN class=variable>btree.GetNodeData</SPAN>(<SPAN class=variable>btree.GetRoot</SPAN>()) &lt;&lt; <SPAN class=selfeval>")  "</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"  /   \\ "</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"("</SPAN> &lt;&lt; <SPAN class=variable>btree.GetNodeData</SPAN>(<SPAN class=variable>btree.GetLeftChild</SPAN>(<SPAN class=variable>btree.GetRoot</SPAN>()))
+         &lt;&lt; <SPAN class=selfeval>")    ("</SPAN> &lt;&lt; <SPAN class=variable>btree.GetNodeData</SPAN>(<SPAN class=variable>btree.GetRightChild</SPAN>(<SPAN class=variable>btree.GetRoot</SPAN>()))
+         &lt;&lt; <SPAN class=selfeval>")"</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"这棵树的叶子数："</SPAN> &lt;&lt; <SPAN class=variable>btree.GetLeafCount</SPAN>() &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"这棵树的深度是："</SPAN> &lt;&lt; <SPAN class=variable>btree.GetDepth</SPAN>() &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=selfeval>"先序遍历："</SPAN>;
+    <SPAN class=variable>btree.PreOrderTraverse</SPAN>(<SPAN class=variable>PrintElement</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN> &lt;&lt; <SPAN class=selfeval>"中序遍历："</SPAN>;
+    <SPAN class=variable>btree.InOrderTraverse</SPAN>(<SPAN class=variable>PrintElement</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN> &lt;&lt; <SPAN class=selfeval>"后序遍历："</SPAN>;
+    <SPAN class=variable>btree.PostOrderTraverse</SPAN>(<SPAN class=variable>PrintElement</SPAN>);
+
+    <SPAN class=variable>cout</SPAN> &lt;&lt; <SPAN class=variable>endl</SPAN>;
+
+    <SPAN class=keyword>return</SPAN> <SPAN class=variable>EXIT_SUCCESS</SPAN>;
+}</PRE>
+<P></P>
+<P></P><A name=node_sec_8.3></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_8.3">8.3&nbsp;&nbsp;说明</A></H2>
+<P>您也许已经注意到了一个“奇怪”的现象：在我的二叉树实现中，有各种对结点的访问操作（例如计算树的高、各种遍历），但就是没有插入和删除这两个操作的函数。其实这并不值得奇怪。因为二叉树基本上是一个最“底层”的类，将来我们在写二叉搜索树等更高级的类时，是要从二叉树开始继承的，而对于树这种非线性的数据结构来说，插入和删除是要根据它所处的环境来具体问题具体分析的——也就是说，没有一个特定的法则（这点不像链表，链表无论怎么变，它都是线性的）。所以，在具体的应用中，我才会给出具体的插入和删除代码。在这里，我用了一种很拙劣的方式来创建了一棵二叉树，请读者在这个问题上不要深究。</P>
+<P>在结点类CBTNode中，我定义了4个成员变量：data、parent、left和right。data表示该结点的数据域，parent表示该结点的父亲结点，left和right分别表示该结点的左右儿子结点。这里要说明的是：</P>
+<P></P>
+<OL>
+  <LI>
+  <P>parent指针并不是必需的，但有了它之后，就会大大简化许多对父亲结点的操作。因此，在资源并不十分紧张的情况下应该考虑加入它。 </P>
+  <LI>
+  <P>二叉树的根结点（root）的parent应该赋值为<CODE class=scheme><SPAN 
+  class=builtin>NULL</SPAN></CODE>。 </P></LI></OL>
+<P></P>
+<P>在二叉树中还大量运用了前面所说的一个强大的工具——递归。例如对二叉树的遍历操作就都是通过递归来实现的（不递归也行，可以用栈来模拟，但速度会比较慢，同时也多占用了很多空间，也就是说，非递归的算法无论是时间复杂度还是空间复杂度都比递归要高——非递归的唯一好处只是节省了堆栈。因此到底选用哪个，就要看具体的应用环境了）。另外，我在先序、中序和后序遍历中用了Visit()这个回调函数，这是为了增加处理的自由度。除此之外，我还写了几个要使用到遍历技术的子函数，如：GetLeafCount()，就是用先序遍历来获得二叉树的叶子个数。在此不一一而足，如有不清楚的地方，请联系我。</P>
+<P></P><A name=node_sec_8.4></A>
+<H2><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_node_sec_8.4">8.4&nbsp;&nbsp;应用</A></H2>
+<P>基本的二叉树还谈不上有什么应用，因此我的示例程序只是做了一个对表达式的转换……您是不是想说，对表达式的转换不是在栈那里已经做过了吗？</P>
+<P>是的！但实际上二叉树这种数据结构才是对表达式的最直观的储存和表达方式，甚至可以说，它天生就是一棵表达式！我的例子代码是用一棵二叉树来表示一个表达式：a + 
+b，执行完后，会得到这样的输出结果：</P>
+<P></P><PRE class=scheme>   (<SPAN class=variable>+</SPAN>)
+  <SPAN class=variable>/</SPAN>   <SPAN class=variable>\
+</SPAN>(<SPAN class=variable>a</SPAN>)    (<SPAN class=variable>b</SPAN>)
+
+<SPAN class=variable>这棵树的叶子数：2</SPAN>
+<SPAN class=variable>这棵树的深度是：1</SPAN>
+<SPAN class=variable>先序遍历：+ab</SPAN>
+<SPAN class=variable>中序遍历：a+b</SPAN>
+<SPAN class=variable>后序遍历：ab+</SPAN>
+</PRE>
+<P></P>
+<DIV class=navigation align=right><I>[<SPAN><A 
+href="http://www.luocong.com/dsaanotes/index.htm">首页</A>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-8.htm">上一页</A></SPAN><SPAN>, <A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-10.htm">下一页</A></SPAN><SPAN>; 
+&nbsp;&nbsp;</SPAN><SPAN><A 
+href="http://www.luocong.com/dsaanotes/index-Z-H-1.htm#node_toc_start">目录 
+</A></SPAN>]</I></DIV>
+<P></P></BODY></HTML>
